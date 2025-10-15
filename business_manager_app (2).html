@@ -200,6 +200,42 @@
             margin-bottom: 1rem;
         }
 
+        .autosave-status {
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            border: 1px dashed var(--border);
+            background: var(--surface);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .autosave-status.success {
+            border-color: var(--success);
+            background: rgba(5, 150, 105, 0.08);
+            color: var(--success);
+        }
+
+        .autosave-status.info {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--primary);
+        }
+
+        .autosave-status.warning {
+            border-color: var(--warning);
+            background: rgba(217, 119, 6, 0.08);
+            color: var(--warning);
+        }
+
+        .autosave-status.error {
+            border-color: var(--danger);
+            background: rgba(220, 38, 38, 0.08);
+            color: var(--danger);
+        }
+
         .form-label {
             display: block;
             margin-bottom: 0.25rem;
@@ -407,6 +443,74 @@
             background: rgb(37 99 235 / 0.05);
         }
 
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .detail-item {
+            background: rgba(148, 163, 184, 0.12);
+            border-radius: var(--border-radius);
+            padding: 0.75rem 1rem;
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .attachment-preview {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .attachment-card {
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            padding: 0.5rem 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--surface);
+        }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.25rem 0.65rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-chip.paid {
+            background: #dcfce7;
+            color: var(--success);
+        }
+
+        .status-chip.pending {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+
+        .status-chip.overdue {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
         .theme-toggle {
             background: none;
             border: 1px solid var(--border);
@@ -594,6 +698,16 @@
                             <button class="btn" onclick="showPurchaseModal()">+ New Purchase</button>
                         </div>
 
+                        <div class="search-filter">
+                            <input type="text" class="search-input" placeholder="Search purchases..." id="purchaseSearch">
+                            <input type="date" class="form-input" id="purchaseDateFilter">
+                            <select class="filter-select" id="purchaseStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="Paid">Paid</option>
+                                <option value="Pending">Pending</option>
+                            </select>
+                        </div>
+
                         <table class="table">
                             <thead>
                                 <tr>
@@ -617,6 +731,14 @@
                         <div class="card-header">
                             <h2 class="card-title">Expense Management</h2>
                             <button class="btn" onclick="showExpenseModal()">+ Add Expense</button>
+                        </div>
+
+                        <div class="search-filter">
+                            <input type="text" class="search-input" placeholder="Search expenses..." id="expenseSearch">
+                            <input type="date" class="form-input" id="expenseDateFilter">
+                            <select class="filter-select" id="expenseCategoryFilter">
+                                <option value="">All Categories</option>
+                            </select>
                         </div>
 
                         <table class="table">
@@ -777,6 +899,7 @@
                                     <option value="purchase-report">Purchase Report</option>
                                     <option value="expense-report">Expense Report</option>
                                     <option value="inventory-valuation">Inventory Valuation</option>
+                                    <option value="business-overview">Business Overview</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -828,6 +951,26 @@
                             </select>
                         </div>
 
+                        <div class="form-group">
+                            <label class="form-label">Inventory Categories (one per line)</label>
+                            <textarea class="form-input" id="inventoryCategories" rows="3" placeholder="Shirts\nPants\nAccessories"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Expense Categories (one per line)</label>
+                            <textarea class="form-input" id="expenseCategories" rows="3" placeholder="Utilities\nWages\nMarketing"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Vendor Names (one per line)</label>
+                            <textarea class="form-input" id="vendorNames" rows="3" placeholder="ABC Textiles\nXYZ Garments"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Bank Names (one per line)</label>
+                            <textarea class="form-input" id="bankNames" rows="3" placeholder="Habib Bank\nMeezan Bank"></textarea>
+                        </div>
+
                         <button class="btn" onclick="saveSettings()">Save Settings</button>
                     </div>
 
@@ -835,6 +978,24 @@
                         <div class="card-header">
                             <h2 class="card-title">Data Management</h2>
                         </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Real-time Autosave</label>
+                            <div class="autosave-status warning" id="autosaveStatus">
+                                Select a JSON file to enable instant saves across browsers and devices.
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem;">
+                            <button class="btn" onclick="connectAutosaveFile()">🔒 Connect Autosave File</button>
+                            <button class="btn secondary" onclick="reconnectAutosaveFile()">🔁 Reconnect</button>
+                            <button class="btn secondary" onclick="forceAutosaveNow()">💾 Save Now</button>
+                            <button class="btn danger" onclick="disconnectAutosaveFile()">❌ Disconnect</button>
+                        </div>
+
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.5rem;">
+                            Once connected, every change you make is written straight to your chosen JSON data file automatically.
+                        </p>
 
                         <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
                             <button class="btn" onclick="exportBackup()">📤 Export Backup</button>
@@ -848,6 +1009,8 @@
             </div>
         </main>
     </div>
+
+    <datalist id="vendorList"></datalist>
 
     <!-- Modals -->
     <!-- Inventory Modal -->
@@ -966,6 +1129,15 @@
                     </select>
                 </div>
 
+                <div class="form-group">
+                    <label class="form-label">Invoice Attachment</label>
+                    <div class="file-upload" onclick="document.getElementById('saleAttachment').click()">
+                        <p>Click to upload invoice/receipt</p>
+                        <input type="file" id="saleAttachment" accept="image/*,.pdf" style="display: none;">
+                    </div>
+                    <small style="color: var(--text-secondary); display: block; margin-top: 0.5rem;">Optional. Upload receipts or screenshots for quick reference.</small>
+                </div>
+
                 <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
                     <button type="button" class="btn secondary" onclick="closeModal('salesModal')">Cancel</button>
                     <button type="submit" class="btn">Save Sale</button>
@@ -985,7 +1157,7 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Supplier</label>
-                        <input type="text" class="form-input" id="purchaseSupplier" required>
+                        <input type="text" class="form-input" id="purchaseSupplier" list="vendorList" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Purchase Date</label>
@@ -1091,7 +1263,7 @@
 
                 <div class="form-group">
                     <label class="form-label">Party/Vendor</label>
-                    <input type="text" class="form-input" id="expenseParty">
+                    <input type="text" class="form-input" id="expenseParty" list="vendorList">
                 </div>
 
                 <div class="form-group">
@@ -1199,6 +1371,17 @@
         </div>
     </div>
 
+    <!-- Detail Modal -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content" style="max-width: 720px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="detailModalTitle">Details</h3>
+                <button class="close-btn" onclick="closeModal('detailModal')">&times;</button>
+            </div>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
     <!-- Transfer Modal -->
     <div class="modal" id="transferModal">
         <div class="modal-content">
@@ -1207,21 +1390,28 @@
                 <button class="close-btn" onclick="closeModal('transferModal')">&times;</button>
             </div>
             <form id="transferForm">
+                <div class="form-group">
+                    <label class="form-label">Transfer Type</label>
+                    <select class="form-input" id="transferType" required>
+                        <option value="">Select Type</option>
+                        <option value="cash-to-bank">Cash ➜ Bank (Deposit)</option>
+                        <option value="bank-to-cash">Bank ➜ Cash (Withdrawal)</option>
+                        <option value="bank-to-bank">Bank ➜ Bank Transfer</option>
+                        <option value="cash-internal">Cash ➜ Cash/Internal</option>
+                    </select>
+                </div>
+
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">From</label>
+                        <label class="form-label">From Account</label>
                         <select class="form-input" id="transferFrom" required>
                             <option value="">Select Source</option>
-                            <option value="Cash">Cash</option>
-                            <option value="Bank">Bank</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">To</label>
+                        <label class="form-label">To Account</label>
                         <select class="form-input" id="transferTo" required>
                             <option value="">Select Destination</option>
-                            <option value="Cash">Cash</option>
-                            <option value="Bank">Bank</option>
                         </select>
                     </div>
                 </div>
@@ -1286,7 +1476,33 @@
         class BusinessDB {
             constructor() {
                 this.db = null;
+                this.preserveTimestamps = false;
+                this.changeListeners = new Set();
                 this.init();
+            }
+
+            onChange(callback) {
+                if (typeof callback === 'function') {
+                    this.changeListeners.add(callback);
+                }
+            }
+
+            offChange(callback) {
+                this.changeListeners.delete(callback);
+            }
+
+            notifyChange(detail = {}) {
+                this.changeListeners.forEach(listener => {
+                    try {
+                        listener(detail);
+                    } catch (error) {
+                        console.error('Change listener failed', error);
+                    }
+                });
+            }
+
+            setPreserveTimestamps(enabled) {
+                this.preserveTimestamps = Boolean(enabled);
             }
 
             async init() {
@@ -1345,29 +1561,64 @@
                         if (!db.objectStoreNames.contains('settings')) {
                             db.createObjectStore('settings', { keyPath: 'key' });
                         }
+                        if (!db.objectStoreNames.contains('formDrafts')) {
+                            db.createObjectStore('formDrafts', { keyPath: 'id' });
+                        }
                     };
                 });
             }
 
             async add(storeName, data) {
-                data.createdAt = new Date();
-                data.updatedAt = new Date();
-                const transaction = this.db.transaction([storeName], 'readwrite');
-                const store = transaction.objectStore(storeName);
-                return store.add(data);
+                const now = new Date();
+                if (!this.preserveTimestamps) {
+                    if (!('createdAt' in data)) {
+                        data.createdAt = now;
+                    }
+                    data.updatedAt = now;
+                } else {
+                    if (data.createdAt) data.createdAt = new Date(data.createdAt);
+                    if (data.updatedAt) data.updatedAt = new Date(data.updatedAt);
+                }
+
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction([storeName], 'readwrite');
+                    const store = transaction.objectStore(storeName);
+                    transaction.oncomplete = () => this.notifyChange({ storeName, type: 'add' });
+                    transaction.onerror = () => reject(transaction.error);
+                    const request = store.add(data);
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
             }
 
             async update(storeName, data) {
-                data.updatedAt = new Date();
-                const transaction = this.db.transaction([storeName], 'readwrite');
-                const store = transaction.objectStore(storeName);
-                return store.put(data);
+                if (!this.preserveTimestamps) {
+                    data.updatedAt = new Date();
+                } else if (data.updatedAt) {
+                    data.updatedAt = new Date(data.updatedAt);
+                }
+
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction([storeName], 'readwrite');
+                    const store = transaction.objectStore(storeName);
+                    transaction.oncomplete = () => this.notifyChange({ storeName, type: 'update' });
+                    transaction.onerror = () => reject(transaction.error);
+                    const request = store.put(data);
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
             }
 
             async delete(storeName, id) {
-                const transaction = this.db.transaction([storeName], 'readwrite');
-                const store = transaction.objectStore(storeName);
-                return store.delete(id);
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction([storeName], 'readwrite');
+                    const store = transaction.objectStore(storeName);
+                    transaction.oncomplete = () => this.notifyChange({ storeName, type: 'delete' });
+                    transaction.onerror = () => reject(transaction.error);
+                    const request = store.delete(id);
+                    request.onsuccess = () => resolve();
+                    request.onerror = () => reject(request.error);
+                });
             }
 
             async getAll(storeName) {
@@ -1391,9 +1642,17 @@
             }
 
             async clear(storeName) {
-                const transaction = this.db.transaction([storeName], 'readwrite');
-                const store = transaction.objectStore(storeName);
-                return store.clear();
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction([storeName], 'readwrite');
+                    const store = transaction.objectStore(storeName);
+                    transaction.oncomplete = () => {
+                        this.notifyChange({ storeName, type: 'clear' });
+                        resolve();
+                    };
+                    transaction.onerror = () => reject(transaction.error);
+                    const request = store.clear();
+                    request.onerror = () => reject(request.error);
+                });
             }
         }
 
@@ -1407,8 +1666,30 @@
             bank: 0,
             loanBalance: 0,
             editingItem: null,
-            paymentType: null
+            editingSale: null,
+            editingPurchase: null,
+            editingExpense: null,
+            paymentType: null,
+            suppressAutosave: false,
+            settingsCache: {
+                inventoryCategories: ['Shirts', 'Pants', 'Accessories'],
+                expenseCategories: ['Utilities', 'Staff Wages', 'Marketing', 'Other'],
+                vendorNames: [],
+                bankNames: []
+            },
+            autosave: {
+                handle: null,
+                fileName: null,
+                lastSaved: null,
+                timer: null,
+                isSaving: false,
+                needsAnotherSave: false,
+                nextSaveReason: null
+            },
+            importingFromFile: false
         };
+
+        db.onChange(() => scheduleRealtimeSave('db-change'));
 
         // Utility functions
         function formatCurrency(amount) {
@@ -1434,6 +1715,681 @@
 
         function generateId() {
             return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function getAutosaveStatusElement() {
+            return document.getElementById('autosaveStatus');
+        }
+
+        function updateAutosaveStatus(message, tone = 'warning') {
+            const el = getAutosaveStatusElement();
+            if (!el) return;
+            el.className = `autosave-status ${tone}`;
+            el.textContent = message;
+        }
+
+        function describeLastSaved() {
+            if (!state.autosave.lastSaved) return '';
+            return `Last saved: ${state.autosave.lastSaved.toLocaleString()}`;
+        }
+
+        async function ensureAutosavePermission(handle, { request = false } = {}) {
+            if (!handle || !handle.queryPermission) return 'denied';
+            try {
+                const options = { mode: 'readwrite' };
+                let permission = await handle.queryPermission(options);
+                if (permission === 'granted' || permission === 'denied' || !request) {
+                    return permission;
+                }
+                return await handle.requestPermission(options);
+            } catch (error) {
+                console.error('Permission request failed', error);
+                return 'denied';
+            }
+        }
+
+        function scheduleRealtimeSave(reason = 'change') {
+            if (!state.autosave || !state.autosave.handle) {
+                updateAutosaveStatus('Select a JSON file to enable instant autosave.', 'warning');
+                return;
+            }
+            if (state.importingFromFile) return;
+
+            state.autosave.nextSaveReason = reason;
+            state.autosave.needsAnotherSave = false;
+
+            if (state.autosave.timer) {
+                clearTimeout(state.autosave.timer);
+            }
+
+            if (state.autosave.isSaving) {
+                state.autosave.needsAnotherSave = true;
+                return;
+            }
+
+            state.autosave.timer = setTimeout(() => {
+                state.autosave.timer = null;
+                persistRealtimeSnapshot(state.autosave.nextSaveReason || 'change');
+            }, 750);
+        }
+
+        async function buildBackupObject({ includeAutosaveHandle = false } = {}) {
+            const stores = ['inventory', 'sales', 'purchases', 'expenses', 'loans', 'payments', 'transfers', 'attachments', 'settings', 'formDrafts'];
+            const data = {};
+            const timestamp = new Date().toISOString();
+
+            for (const store of stores) {
+                const records = await db.getAll(store);
+                if (store === 'settings' && !includeAutosaveHandle) {
+                    data[store] = records.filter(entry => entry.key !== 'autosaveFileHandle');
+                } else {
+                    data[store] = records;
+                }
+            }
+
+            return {
+                version: '1.1',
+                exportedAt: timestamp,
+                timestamp,
+                data
+            };
+        }
+
+        async function persistRealtimeSnapshot(reason = 'change') {
+            if (!state.autosave.handle) return;
+
+            if (state.autosave.isSaving) {
+                state.autosave.needsAnotherSave = true;
+                state.autosave.nextSaveReason = reason;
+                return;
+            }
+
+            state.autosave.isSaving = true;
+            updateAutosaveStatus(`Saving changes to ${state.autosave.fileName || 'data file'}…`, 'info');
+
+            try {
+                const snapshot = await buildBackupObject();
+                const writable = await state.autosave.handle.createWritable();
+                await writable.write(JSON.stringify(snapshot, null, 2));
+                await writable.close();
+                state.autosave.lastSaved = new Date();
+                const lastSavedText = describeLastSaved();
+                const successMessage = lastSavedText
+                    ? `Connected to ${state.autosave.fileName || 'data file'}. ${lastSavedText}`
+                    : `Connected to ${state.autosave.fileName || 'data file'}.`;
+                updateAutosaveStatus(successMessage, 'success');
+            } catch (error) {
+                console.error('Failed to persist autosave snapshot', error);
+                updateAutosaveStatus(`Autosave failed: ${error.message}`, 'error');
+            } finally {
+                state.autosave.isSaving = false;
+                state.autosave.nextSaveReason = null;
+                if (state.autosave.needsAnotherSave) {
+                    state.autosave.needsAnotherSave = false;
+                    scheduleRealtimeSave('queued');
+                }
+            }
+        }
+
+        async function syncFromAutosaveFile(handle) {
+            if (!handle || !handle.getFile) return;
+            const permission = await ensureAutosavePermission(handle, { request: false });
+            if (permission !== 'granted') {
+                updateAutosaveStatus('Click “Reconnect” to allow the app to access your autosave file.', 'warning');
+                return;
+            }
+
+            try {
+                const file = await handle.getFile();
+                if (file.size === 0) {
+                    updateAutosaveStatus(`Connected to ${state.autosave.fileName || file.name}. Waiting for first save…`, 'info');
+                    return;
+                }
+                const text = await file.text();
+                const backup = JSON.parse(text);
+                await restoreBackupData(backup, { preserveAutosaveHandle: true, skipAutosave: true });
+                await loadSettings({ skipAutosaveReconnect: true });
+                if (backup.exportedAt) {
+                    const lastSaved = new Date(backup.exportedAt);
+                    if (!isNaN(lastSaved.getTime())) {
+                        state.autosave.lastSaved = lastSaved;
+                    }
+                }
+                const lastSavedText = describeLastSaved();
+                const message = lastSavedText
+                    ? `Connected to ${state.autosave.fileName || file.name}. ${lastSavedText}`
+                    : `Connected to ${state.autosave.fileName || file.name}.`;
+                updateAutosaveStatus(message, 'success');
+                await loadPageData(state.currentPage);
+                await updateSummaryChips();
+            } catch (error) {
+                console.error('Failed to sync from autosave file', error);
+                updateAutosaveStatus(`Could not read autosave file: ${error.message}`, 'error');
+            }
+        }
+
+        async function connectAutosaveFile() {
+            if (!window.showSaveFilePicker) {
+                showToast('Your browser does not support connecting to local files for autosave.', 'error');
+                return;
+            }
+
+            try {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: 'business-data.json',
+                    types: [{
+                        description: 'Business Manager Data',
+                        accept: { 'application/json': ['.json'] }
+                    }]
+                });
+
+                state.autosave.handle = handle;
+                state.autosave.fileName = handle.name || 'business-data.json';
+                await db.update('settings', { key: 'autosaveFileHandle', value: handle });
+                await db.update('settings', { key: 'autosaveFileName', value: state.autosave.fileName });
+
+                const permission = await ensureAutosavePermission(handle, { request: true });
+                if (permission !== 'granted') {
+                    updateAutosaveStatus('Permission denied. Click “Reconnect” to try again.', 'error');
+                    return;
+                }
+
+                updateAutosaveStatus(`Connected to ${state.autosave.fileName}. Saving…`, 'info');
+                await persistRealtimeSnapshot('initial-connect');
+                showToast('Autosave connected successfully');
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    return;
+                }
+                console.error('Failed to connect autosave file', error);
+                showToast('Could not connect autosave file: ' + error.message, 'error');
+            }
+        }
+
+        async function reconnectAutosaveFile() {
+            if (!state.autosave.handle) {
+                showToast('No autosave file connected yet.', 'error');
+                return;
+            }
+
+            const permission = await ensureAutosavePermission(state.autosave.handle, { request: true });
+            if (permission !== 'granted') {
+                updateAutosaveStatus('Permission denied. Please pick the autosave file again.', 'error');
+                return;
+            }
+
+            updateAutosaveStatus(`Connected to ${state.autosave.fileName}. Refreshing…`, 'info');
+            await syncFromAutosaveFile(state.autosave.handle);
+            await persistRealtimeSnapshot('reconnect');
+            showToast('Autosave file reconnected');
+        }
+
+        async function disconnectAutosaveFile() {
+            state.autosave.handle = null;
+            state.autosave.fileName = null;
+            state.autosave.lastSaved = null;
+            if (state.autosave.timer) {
+                clearTimeout(state.autosave.timer);
+                state.autosave.timer = null;
+            }
+            state.autosave.needsAnotherSave = false;
+            state.autosave.nextSaveReason = null;
+            state.autosave.isSaving = false;
+
+            try {
+                await db.delete('settings', 'autosaveFileHandle');
+            } catch (_) { /* ignore */ }
+            try {
+                await db.delete('settings', 'autosaveFileName');
+            } catch (_) { /* ignore */ }
+
+            updateAutosaveStatus('Autosave disconnected. Select a JSON file to resume instant backups.', 'warning');
+            showToast('Autosave file disconnected');
+        }
+
+        function forceAutosaveNow() {
+            if (!state.autosave.handle) {
+                showToast('Connect an autosave file first.', 'error');
+                return;
+            }
+            persistRealtimeSnapshot('manual');
+        }
+
+        async function saveAttachment(entity, entityId, file) {
+            if (!file) return null;
+            const dataUrl = await readFileAsDataURL(file);
+            const attachment = {
+                entity,
+                entityId,
+                name: file.name,
+                type: file.type,
+                size: file.size,
+                dataUrl
+            };
+            const id = await db.add('attachments', attachment);
+            return id;
+        }
+
+        async function getAttachments(entity, entityId) {
+            const attachments = await db.getAll('attachments');
+            return attachments.filter(att => att.entity === entity && att.entityId === entityId);
+        }
+
+        async function deleteAttachments(entity, entityId) {
+            const attachments = await getAttachments(entity, entityId);
+            for (const attachment of attachments) {
+                await db.delete('attachments', attachment.id);
+            }
+        }
+
+        function renderAttachments(attachments) {
+            if (!attachments || attachments.length === 0) {
+                return '<p style="color: var(--text-secondary);">No attachments uploaded.</p>';
+            }
+
+            return `
+                <div class="attachment-preview">
+                    ${attachments.map(att => `
+                        <a class="attachment-card" href="${att.dataUrl}" download="${att.name}" target="_blank" rel="noopener">
+                            📎 <span>${att.name}</span>
+                        </a>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function debounce(fn, delay = 300) {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => fn(...args), delay);
+            };
+        }
+
+        const formDraftHandlers = {
+            inventoryForm: {
+                serialize: () => ({
+                    itemSku: document.getElementById('itemSku').value,
+                    itemName: document.getElementById('itemName').value,
+                    itemCategory: document.getElementById('itemCategory').value,
+                    itemMinStock: document.getElementById('itemMinStock').value,
+                    itemCostPrice: document.getElementById('itemCostPrice').value,
+                    itemSellingPrice: document.getElementById('itemSellingPrice').value,
+                    itemStock: document.getElementById('itemStock').value
+                }),
+                populate: async (data = {}) => {
+                    document.getElementById('itemSku').value = data.itemSku || '';
+                    document.getElementById('itemName').value = data.itemName || '';
+                    document.getElementById('itemCategory').value = data.itemCategory || '';
+                    document.getElementById('itemMinStock').value = data.itemMinStock || '';
+                    document.getElementById('itemCostPrice').value = data.itemCostPrice || '';
+                    document.getElementById('itemSellingPrice').value = data.itemSellingPrice || '';
+                    document.getElementById('itemStock').value = data.itemStock || '';
+                }
+            },
+            salesForm: {
+                serialize: () => {
+                    const container = document.getElementById('saleItems');
+                    const items = Array.from(container.querySelectorAll('.sale-item-row')).map(row => ({
+                        itemId: row.querySelector('.sale-item-select')?.value || '',
+                        qty: row.querySelector('.sale-qty')?.value || '',
+                        price: row.querySelector('.sale-price')?.value || ''
+                    }));
+
+                    return {
+                        saleCustomer: document.getElementById('saleCustomer').value,
+                        saleDate: document.getElementById('saleDate').value,
+                        saleDiscount: document.getElementById('saleDiscount').value,
+                        saleShipping: document.getElementById('saleShipping').value,
+                        salePaymentMethod: document.getElementById('salePaymentMethod').value,
+                        items
+                    };
+                },
+                populate: async (data = {}) => {
+                    document.getElementById('saleCustomer').value = data.saleCustomer || '';
+                    document.getElementById('saleDate').value = data.saleDate || '';
+                    document.getElementById('saleDiscount').value = data.saleDiscount ?? 0;
+                    document.getElementById('saleShipping').value = data.saleShipping ?? 0;
+                    document.getElementById('salePaymentMethod').value = data.salePaymentMethod || '';
+
+                    const container = document.getElementById('saleItems');
+                    container.innerHTML = '';
+                    const items = data.items && data.items.length ? data.items : [{}];
+                    items.forEach(() => addSaleItem());
+                    await loadSaleItems();
+
+                    const rows = container.querySelectorAll('.sale-item-row');
+                    items.forEach((item, index) => {
+                        const row = rows[index];
+                        if (!row) return;
+                        row.querySelector('.sale-item-select').value = item.itemId || '';
+                        row.querySelector('.sale-qty').value = item.qty || '';
+                        row.querySelector('.sale-price').value = item.price || '';
+                    });
+                }
+            },
+            purchaseForm: {
+                serialize: () => {
+                    const container = document.getElementById('purchaseItems');
+                    const items = Array.from(container.querySelectorAll('.purchase-item-row')).map(row => ({
+                        itemId: row.querySelector('.purchase-item-select')?.value || '',
+                        qty: row.querySelector('.purchase-qty')?.value || '',
+                        cost: row.querySelector('.purchase-cost')?.value || ''
+                    }));
+
+                    return {
+                        purchaseSupplier: document.getElementById('purchaseSupplier').value,
+                        purchaseDate: document.getElementById('purchaseDate').value,
+                        purchasePaymentMethod: document.getElementById('purchasePaymentMethod')?.value || '',
+                        items
+                    };
+                },
+                populate: async (data = {}) => {
+                    document.getElementById('purchaseSupplier').value = data.purchaseSupplier || '';
+                    document.getElementById('purchaseDate').value = data.purchaseDate || '';
+                    const paymentMethod = document.getElementById('purchasePaymentMethod');
+                    if (paymentMethod) {
+                        paymentMethod.value = data.purchasePaymentMethod || '';
+                    }
+
+                    const container = document.getElementById('purchaseItems');
+                    container.innerHTML = '';
+                    const items = data.items && data.items.length ? data.items : [{}];
+                    items.forEach(() => addPurchaseItem());
+                    await loadPurchaseItems();
+
+                    const rows = container.querySelectorAll('.purchase-item-row');
+                    items.forEach((item, index) => {
+                        const row = rows[index];
+                        if (!row) return;
+                        row.querySelector('.purchase-item-select').value = item.itemId || '';
+                        row.querySelector('.purchase-qty').value = item.qty || '';
+                        row.querySelector('.purchase-cost').value = item.cost || '';
+                    });
+                }
+            },
+            expenseForm: {
+                serialize: () => ({
+                    expenseDate: document.getElementById('expenseDate').value,
+                    expenseCategory: document.getElementById('expenseCategory').value,
+                    expenseDescription: document.getElementById('expenseDescription').value,
+                    expenseAmount: document.getElementById('expenseAmount').value,
+                    expensePaymentMethod: document.getElementById('expensePaymentMethod').value,
+                    expenseParty: document.getElementById('expenseParty').value
+                }),
+                populate: async (data = {}) => {
+                    document.getElementById('expenseDate').value = data.expenseDate || '';
+                    document.getElementById('expenseCategory').value = data.expenseCategory || '';
+                    document.getElementById('expenseDescription').value = data.expenseDescription || '';
+                    document.getElementById('expenseAmount').value = data.expenseAmount || '';
+                    document.getElementById('expensePaymentMethod').value = data.expensePaymentMethod || '';
+                    document.getElementById('expenseParty').value = data.expenseParty || '';
+                }
+            },
+            loanForm: {
+                serialize: () => ({
+                    loanDate: document.getElementById('loanDate').value,
+                    loanType: document.getElementById('loanType').value,
+                    loanAmount: document.getElementById('loanAmount').value,
+                    loanDescription: document.getElementById('loanDescription').value
+                }),
+                populate: async (data = {}) => {
+                    document.getElementById('loanDate').value = data.loanDate || '';
+                    document.getElementById('loanType').value = data.loanType || '';
+                    document.getElementById('loanAmount').value = data.loanAmount || '';
+                    document.getElementById('loanDescription').value = data.loanDescription || '';
+                }
+            },
+            paymentForm: {
+                serialize: () => ({
+                    paymentType: state.paymentType,
+                    paymentInvoice: document.getElementById('paymentInvoice').value,
+                    paymentDate: document.getElementById('paymentDate').value,
+                    paymentAmount: document.getElementById('paymentAmount').value,
+                    paymentMethod: document.getElementById('paymentMethod').value,
+                    paymentNotes: document.getElementById('paymentNotes').value
+                }),
+                populate: async (data = {}, context = {}) => {
+                    const expectedType = context.expectedType || state.paymentType || 'payable';
+                    if (data.paymentType && data.paymentType !== expectedType) {
+                        return false;
+                    }
+                    const effectiveType = data.paymentType || expectedType;
+                    state.paymentType = effectiveType;
+                    await loadPaymentInvoices(effectiveType);
+                    document.getElementById('paymentInvoice').value = data.paymentInvoice || '';
+                    document.getElementById('paymentDate').value = data.paymentDate || '';
+                    document.getElementById('paymentAmount').value = data.paymentAmount || '';
+                    document.getElementById('paymentMethod').value = data.paymentMethod || '';
+                    document.getElementById('paymentNotes').value = data.paymentNotes || '';
+                    return true;
+                }
+            },
+            transferForm: {
+                serialize: () => ({
+                    transferType: document.getElementById('transferType').value,
+                    transferFrom: document.getElementById('transferFrom').value,
+                    transferTo: document.getElementById('transferTo').value,
+                    transferDate: document.getElementById('transferDate').value,
+                    transferAmount: document.getElementById('transferAmount').value,
+                    transferDescription: document.getElementById('transferDescription').value
+                }),
+                populate: async (data = {}) => {
+                    applySettingsToUI();
+                    document.getElementById('transferType').value = data.transferType || '';
+                    document.getElementById('transferFrom').value = data.transferFrom || '';
+                    document.getElementById('transferTo').value = data.transferTo || '';
+                    document.getElementById('transferDate').value = data.transferDate || '';
+                    document.getElementById('transferAmount').value = data.transferAmount || '';
+                    document.getElementById('transferDescription').value = data.transferDescription || '';
+                }
+            }
+        };
+
+        async function saveFormDraft(formId, draft) {
+            try {
+                const existing = await db.get('formDrafts', formId);
+                if (existing) {
+                    await db.update('formDrafts', { ...existing, data: draft });
+                } else {
+                    await db.add('formDrafts', { id: formId, data: draft });
+                }
+            } catch (error) {
+                console.error(`Failed to save draft for ${formId}`, error);
+            }
+        }
+
+        async function loadFormDraft(formId) {
+            try {
+                const record = await db.get('formDrafts', formId);
+                return record?.data || null;
+            } catch (error) {
+                console.error(`Failed to load draft for ${formId}`, error);
+                return null;
+            }
+        }
+
+        async function clearFormDraft(formId) {
+            try {
+                await db.delete('formDrafts', formId);
+            } catch (error) {
+                console.error(`Failed to clear draft for ${formId}`, error);
+            }
+        }
+
+        async function restoreFormDraft(formId, context = {}) {
+            const handler = formDraftHandlers[formId];
+            if (!handler) return false;
+
+            const previousSuppression = state.suppressAutosave;
+            try {
+                const draft = await loadFormDraft(formId);
+                if (!draft) {
+                    return false;
+                }
+                state.suppressAutosave = true;
+                const applied = await handler.populate(draft, context);
+                return applied !== false;
+            } catch (error) {
+                console.error(`Failed to restore draft for ${formId}`, error);
+                return false;
+            } finally {
+                state.suppressAutosave = previousSuppression;
+            }
+        }
+
+        function setupFormAutosave() {
+            Object.entries(formDraftHandlers).forEach(([formId, handler]) => {
+                const form = document.getElementById(formId);
+                if (!form || typeof handler.serialize !== 'function') return;
+
+                const saveDraft = debounce(async () => {
+                    try {
+                        const draft = await Promise.resolve(handler.serialize());
+                        await saveFormDraft(formId, draft);
+                    } catch (error) {
+                        console.error(`Autosave failed for ${formId}`, error);
+                    }
+                }, 400);
+
+                form.addEventListener('input', saveDraft);
+                form.addEventListener('change', saveDraft);
+            });
+        }
+
+        function triggerDraftSave(formId) {
+            if (state.suppressAutosave) return;
+            const handler = formDraftHandlers[formId];
+            if (!handler || typeof handler.serialize !== 'function') return;
+            Promise.resolve(handler.serialize())
+                .then(draft => saveFormDraft(formId, draft))
+                .catch(error => console.error(`Manual autosave failed for ${formId}`, error));
+        }
+
+        function parseListInput(value, fallback = []) {
+            const lines = (value || '').split('\n').map(line => line.trim()).filter(Boolean);
+            return lines.length ? Array.from(new Set(lines)) : fallback;
+        }
+
+        function applySettingsToUI() {
+            const { inventoryCategories, expenseCategories, vendorNames, bankNames } = state.settingsCache;
+
+            const categorySelect = document.getElementById('itemCategory');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const currentCategorySelection = categorySelect ? categorySelect.value : '';
+
+            if (categorySelect) {
+                categorySelect.innerHTML = '<option value="">Select Category</option>' +
+                    inventoryCategories.map(category => `<option value="${category}">${category}</option>`).join('');
+                if (currentCategorySelection && !inventoryCategories.includes(currentCategorySelection)) {
+                    categorySelect.insertAdjacentHTML('beforeend', `<option value="${currentCategorySelection}">${currentCategorySelection}</option>`);
+                }
+                if (currentCategorySelection) {
+                    categorySelect.value = currentCategorySelection;
+                }
+            }
+
+            if (categoryFilter) {
+                const selectedValue = categoryFilter.value;
+                categoryFilter.innerHTML = '<option value="">All Categories</option>' +
+                    inventoryCategories.map(category => `<option value="${category}">${category}</option>`).join('');
+                if (inventoryCategories.includes(selectedValue)) {
+                    categoryFilter.value = selectedValue;
+                }
+            }
+
+            const expenseCategorySelect = document.getElementById('expenseCategory');
+            const expenseFilterSelect = document.getElementById('expenseCategoryFilter');
+            const currentExpenseCategory = expenseCategorySelect ? expenseCategorySelect.value : '';
+
+            if (expenseCategorySelect) {
+                expenseCategorySelect.innerHTML = '<option value="">Select Category</option>' +
+                    expenseCategories.map(category => `<option value="${category}">${category}</option>`).join('');
+                if (currentExpenseCategory && !expenseCategories.includes(currentExpenseCategory)) {
+                    expenseCategorySelect.insertAdjacentHTML('beforeend', `<option value="${currentExpenseCategory}">${currentExpenseCategory}</option>`);
+                }
+                if (currentExpenseCategory) {
+                    expenseCategorySelect.value = currentExpenseCategory;
+                }
+            }
+
+            if (expenseFilterSelect) {
+                const selectedValue = expenseFilterSelect.value;
+                expenseFilterSelect.innerHTML = '<option value="">All Categories</option>' +
+                    expenseCategories.map(category => `<option value="${category}">${category}</option>`).join('');
+                if (expenseCategories.includes(selectedValue)) {
+                    expenseFilterSelect.value = selectedValue;
+                }
+            }
+
+            const vendorList = document.getElementById('vendorList');
+            if (vendorList) {
+                vendorList.innerHTML = vendorNames.map(vendor => `<option value="${vendor}"></option>`).join('');
+            }
+
+            const transferFrom = document.getElementById('transferFrom');
+            const transferTo = document.getElementById('transferTo');
+            const bankOptions = bankNames.map(bank => `Bank: ${bank}`);
+            const accountOptions = ['Cash', ...bankOptions];
+
+            if (transferFrom) {
+                const selected = transferFrom.value;
+                transferFrom.innerHTML = '<option value="">Select Source</option>' +
+                    accountOptions.map(option => `<option value="${option}">${option}</option>`).join('');
+                if (accountOptions.includes(selected)) transferFrom.value = selected;
+            }
+
+            if (transferTo) {
+                const selected = transferTo.value;
+                transferTo.innerHTML = '<option value="">Select Destination</option>' +
+                    accountOptions.map(option => `<option value="${option}">${option}</option>`).join('');
+                if (accountOptions.includes(selected)) transferTo.value = selected;
+            }
+        }
+
+        function renderStatusChip(status, isOverdue = false) {
+            const normalized = (status || '').toLowerCase();
+            let cls = 'pending';
+            let label = status || 'Pending';
+
+            if (normalized === 'paid') {
+                cls = 'paid';
+            } else if (normalized === 'pending' && isOverdue) {
+                cls = 'overdue';
+                label = 'Overdue';
+            }
+
+            return `<span class="status-chip ${cls}">${label}</span>`;
+        }
+
+        function showDetails(title, content) {
+            document.getElementById('detailModalTitle').textContent = title;
+            document.getElementById('detailContent').innerHTML = content;
+            showModal('detailModal');
+        }
+
+        function formatTransferType(type) {
+            switch (type) {
+                case 'cash-to-bank':
+                    return 'Cash ➜ Bank';
+                case 'bank-to-cash':
+                    return 'Bank ➜ Cash';
+                case 'bank-to-bank':
+                    return 'Bank ➜ Bank';
+                case 'cash-internal':
+                    return 'Cash Transfer';
+                default:
+                    return 'Transfer';
+            }
         }
 
         // Navigation
@@ -1462,11 +2418,36 @@
         }
 
         function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-            // Reset forms
-            const form = document.querySelector(`#${modalId} form`);
-            if (form) form.reset();
-            state.editingItem = null;
+            const previousSuppression = state.suppressAutosave;
+            state.suppressAutosave = true;
+            try {
+                document.getElementById(modalId).classList.remove('active');
+                // Reset forms
+                const form = document.querySelector(`#${modalId} form`);
+                if (form) form.reset();
+                state.editingItem = null;
+                if (modalId === 'salesModal') {
+                    state.editingSale = null;
+                    const container = document.getElementById('saleItems');
+                    if (container) {
+                        container.innerHTML = '';
+                        addSaleItem();
+                    }
+                }
+                if (modalId === 'purchaseModal') {
+                    state.editingPurchase = null;
+                    const container = document.getElementById('purchaseItems');
+                    if (container) {
+                        container.innerHTML = '';
+                        addPurchaseItem();
+                    }
+                }
+                if (modalId === 'expenseModal') {
+                    state.editingExpense = null;
+                }
+            } finally {
+                state.suppressAutosave = previousSuppression;
+            }
         }
 
         // Load page data
@@ -1522,10 +2503,15 @@
 
             // Process transfers
             transfers.forEach(transfer => {
-                if (transfer.from === 'Cash' && transfer.to === 'Bank') {
+                const fromCash = transfer.from === 'Cash';
+                const toCash = transfer.to === 'Cash';
+                const fromBank = transfer.from && transfer.from.startsWith('Bank');
+                const toBank = transfer.to && transfer.to.startsWith('Bank');
+
+                if (fromCash && toBank) {
                     cash -= transfer.amount;
                     bank += transfer.amount;
-                } else if (transfer.from === 'Bank' && transfer.to === 'Cash') {
+                } else if (fromBank && toCash) {
                     bank -= transfer.amount;
                     cash += transfer.amount;
                 }
@@ -1663,16 +2649,37 @@
         async function loadInventory() {
             const inventory = await db.getAll('inventory');
             const tbody = document.getElementById('inventoryTable');
-            
-            tbody.innerHTML = inventory.map(item => `
+            const searchTerm = (document.getElementById('inventorySearch')?.value || '').toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter')?.value || '';
+
+            const filtered = inventory.filter(item => {
+                const matchesSearch = !searchTerm ||
+                    item.name.toLowerCase().includes(searchTerm) ||
+                    item.sku.toLowerCase().includes(searchTerm) ||
+                    (item.category || '').toLowerCase().includes(searchTerm);
+                const matchesCategory = !categoryFilter || item.category === categoryFilter;
+                return matchesSearch && matchesCategory;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align:center; color: var(--text-secondary);">No inventory items found.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(item => `
                 <tr>
                     <td>${item.sku}</td>
                     <td>${item.name}</td>
-                    <td>${item.category}</td>
+                    <td>${item.category || '-'}</td>
                     <td>${item.stock} ${item.stock <= (item.minStock || 0) ? '<span style="color: var(--danger);">⚠️ Low</span>' : ''}</td>
                     <td>${formatCurrency(item.costPrice)}</td>
                     <td>${formatCurrency(item.sellingPrice)}</td>
                     <td>
+                        <button class="btn btn-sm" onclick="viewInventoryItem(${item.id})">View</button>
                         <button class="btn btn-sm" onclick="editInventoryItem(${item.id})">Edit</button>
                         <button class="btn danger btn-sm" onclick="deleteInventoryItem(${item.id})">Delete</button>
                     </td>
@@ -1680,8 +2687,46 @@
             `).join('');
         }
 
-        function showInventoryModal() {
+        async function viewInventoryItem(id) {
+            const item = await db.get('inventory', id);
+            const content = `
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <div class="detail-label">SKU</div>
+                        <div class="detail-value">${item.sku}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Name</div>
+                        <div class="detail-value">${item.name}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Category</div>
+                        <div class="detail-value">${item.category || '-'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Stock</div>
+                        <div class="detail-value">${item.stock}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Cost Price</div>
+                        <div class="detail-value">${formatCurrency(item.costPrice)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Selling Price</div>
+                        <div class="detail-value">${formatCurrency(item.sellingPrice)}</div>
+                    </div>
+                </div>
+            `;
+            showDetails('Inventory Item', content);
+        }
+
+        async function showInventoryModal() {
             showModal('inventoryModal');
+            if (!state.editingItem) {
+                document.getElementById('inventoryForm').reset();
+                document.getElementById('itemCategory').value = '';
+                await restoreFormDraft('inventoryForm');
+            }
             document.getElementById('itemSku').focus();
         }
 
@@ -1710,29 +2755,89 @@
 
         // Sales functions
         async function loadSales() {
-            const sales = await db.getAll('sales');
+            const [sales, payments] = await Promise.all([
+                db.getAll('sales'),
+                db.getAll('payments')
+            ]);
             const tbody = document.getElementById('salesTable');
-            
-            tbody.innerHTML = sales.map(sale => `
+            const searchTerm = (document.getElementById('salesSearch')?.value || '').toLowerCase();
+            const dateFilter = document.getElementById('salesDateFilter')?.value || '';
+            const statusFilter = document.getElementById('salesStatusFilter')?.value || '';
+
+            const enriched = sales.map(sale => {
+                const received = payments
+                    .filter(payment => payment.type === 'receivable' && payment.invoiceId === sale.id)
+                    .reduce((sum, payment) => sum + payment.amount, 0);
+                const outstanding = sale.paymentMethod === 'Credit'
+                    ? Math.max(0, (sale.total || 0) - received)
+                    : 0;
+                const dueDate = new Date(sale.date);
+                dueDate.setDate(dueDate.getDate() + 30);
+                const isOverdue = outstanding > 0 && new Date() > dueDate;
+                const status = outstanding === 0 ? 'Paid' : (sale.status || (sale.paymentMethod === 'Credit' ? 'Pending' : 'Paid'));
+
+                return { ...sale, received, outstanding, status, isOverdue };
+            });
+
+            const filtered = enriched.filter(sale => {
+                const matchesSearch = !searchTerm ||
+                    sale.invoiceNumber.toLowerCase().includes(searchTerm) ||
+                    sale.customer.toLowerCase().includes(searchTerm);
+                const matchesDate = !dateFilter || sale.date === dateFilter;
+                const matchesStatus = !statusFilter || sale.status === statusFilter;
+                return matchesSearch && matchesDate && matchesStatus;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align:center; color: var(--text-secondary);">No sales found.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(sale => `
                 <tr>
                     <td>${sale.invoiceNumber}</td>
                     <td>${formatDate(sale.date)}</td>
                     <td>${sale.customer}</td>
                     <td>${sale.items.length} items</td>
                     <td>${formatCurrency(sale.total)}</td>
-                    <td><span class="chip ${sale.paymentMethod === 'Credit' ? 'warning' : 'success'}">${sale.paymentMethod}</span></td>
+                    <td>${renderStatusChip(sale.status, sale.isOverdue)}</td>
                     <td>
                         <button class="btn btn-sm" onclick="viewSale(${sale.id})">View</button>
+                        <button class="btn btn-sm" onclick="editSale(${sale.id})">Edit</button>
                         <button class="btn danger btn-sm" onclick="deleteSale(${sale.id})">Delete</button>
                     </td>
                 </tr>
             `).join('');
         }
 
-        function showSalesModal() {
+        async function showSalesModal() {
             showModal('salesModal');
-            loadSaleItems();
-            document.getElementById('saleDate').value = new Date().toISOString().split('T')[0];
+            if (!state.editingSale) {
+                const previousSuppression = state.suppressAutosave;
+                state.suppressAutosave = true;
+                try {
+                    document.getElementById('salesForm').reset();
+                    document.getElementById('saleDiscount').value = 0;
+                    document.getElementById('saleShipping').value = 0;
+                    const container = document.getElementById('saleItems');
+                    container.innerHTML = '';
+                    addSaleItem();
+                    await loadSaleItems();
+                } finally {
+                    state.suppressAutosave = previousSuppression;
+                }
+                const applied = await restoreFormDraft('salesForm');
+                const dateInput = document.getElementById('saleDate');
+                if (!applied || !dateInput.value) {
+                    dateInput.value = new Date().toISOString().split('T')[0];
+                }
+            } else {
+                await loadSaleItems();
+            }
         }
 
         async function loadSaleItems() {
@@ -1765,37 +2870,231 @@
             `;
             container.appendChild(newRow);
             loadSaleItems();
+            triggerDraftSave('salesForm');
         }
 
         function removeSaleItem(button) {
             button.parentElement.remove();
+            triggerDraftSave('salesForm');
+        }
+
+        async function viewSale(id) {
+            const sale = await db.get('sales', id);
+            const attachments = await getAttachments('sale', id);
+            const payments = await db.getAll('payments');
+            const linkedPayments = payments.filter(payment => payment.type === 'receivable' && payment.invoiceId === id);
+            const paid = linkedPayments.reduce((sum, payment) => sum + payment.amount, 0);
+            const outstanding = sale.paymentMethod === 'Credit'
+                ? Math.max(0, (sale.total || 0) - paid)
+                : 0;
+
+            const content = `
+                <div class="detail-grid">
+                    <div class="detail-item"><div class="detail-label">Invoice #</div><div class="detail-value">${sale.invoiceNumber}</div></div>
+                    <div class="detail-item"><div class="detail-label">Customer</div><div class="detail-value">${sale.customer}</div></div>
+                    <div class="detail-item"><div class="detail-label">Date</div><div class="detail-value">${formatDate(sale.date)}</div></div>
+                    <div class="detail-item"><div class="detail-label">Status</div><div class="detail-value">${renderStatusChip(sale.status || 'Pending', outstanding > 0)}</div></div>
+                    <div class="detail-item"><div class="detail-label">Total</div><div class="detail-value">${formatCurrency(sale.total)}</div></div>
+                    <div class="detail-item"><div class="detail-label">Outstanding</div><div class="detail-value">${formatCurrency(outstanding)}</div></div>
+                </div>
+                <h4 style="margin-bottom: 0.75rem;">Items</h4>
+                <table class="table" style="margin-bottom: 1.5rem;">
+                    <thead>
+                        <tr><th>SKU</th><th>Name</th><th>Qty</th><th>Price</th><th>Total</th></tr>
+                    </thead>
+                    <tbody>
+                        ${sale.items.map(item => `
+                            <tr>
+                                <td>${item.sku}</td>
+                                <td>${item.name}</td>
+                                <td>${item.qty}</td>
+                                <td>${formatCurrency(item.price)}</td>
+                                <td>${formatCurrency(item.total)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <h4 style="margin-bottom: 0.75rem;">Payments</h4>
+                ${linkedPayments.length ? `
+                    <table class="table" style="margin-bottom: 1.5rem;">
+                        <thead><tr><th>Date</th><th>Method</th><th>Amount</th><th>Notes</th></tr></thead>
+                        <tbody>
+                            ${linkedPayments.map(payment => `
+                                <tr>
+                                    <td>${formatDate(payment.date)}</td>
+                                    <td>${payment.method}</td>
+                                    <td>${formatCurrency(payment.amount)}</td>
+                                    <td>${payment.notes || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                ` : '<p style="color: var(--text-secondary);">No payments recorded.</p>'}
+                <h4 style="margin-bottom: 0.75rem;">Attachments</h4>
+                ${renderAttachments(attachments)}
+            `;
+            showDetails('Sale Details', content);
+        }
+
+        async function editSale(id) {
+            const sale = await db.get('sales', id);
+            state.editingSale = sale;
+            const previousSuppression = state.suppressAutosave;
+            state.suppressAutosave = true;
+            try {
+                document.getElementById('saleCustomer').value = sale.customer;
+                document.getElementById('saleDate').value = sale.date;
+                document.getElementById('saleDiscount').value = sale.discount || 0;
+                document.getElementById('saleShipping').value = sale.shipping || 0;
+                document.getElementById('salePaymentMethod').value = sale.paymentMethod;
+
+                const container = document.getElementById('saleItems');
+                container.innerHTML = '';
+
+                sale.items.forEach(() => addSaleItem());
+                await loadSaleItems();
+
+                const rows = container.querySelectorAll('.sale-item-row');
+                sale.items.forEach((item, index) => {
+                    const row = rows[index];
+                    row.querySelector('.sale-item-select').value = item.itemId;
+                    row.querySelector('.sale-qty').value = item.qty;
+                    row.querySelector('.sale-price').value = item.price;
+                });
+
+                document.getElementById('saleAttachment').value = '';
+            } finally {
+                state.suppressAutosave = previousSuppression;
+            }
+            showModal('salesModal');
+        }
+
+        async function deleteSale(id) {
+            if (!confirm('Delete this sale invoice? This will restock sold items.')) return;
+
+            const sale = await db.get('sales', id);
+            if (!sale) return;
+
+            for (const item of sale.items) {
+                const inventoryItem = await db.get('inventory', item.itemId);
+                if (inventoryItem) {
+                    inventoryItem.stock += item.qty;
+                    await db.update('inventory', inventoryItem);
+                }
+            }
+
+            const payments = await db.getAll('payments');
+            const related = payments.filter(payment => payment.type === 'receivable' && payment.invoiceId === id);
+            for (const payment of related) {
+                await db.delete('payments', payment.id);
+            }
+
+            await deleteAttachments('sale', id);
+            await db.delete('sales', id);
+
+            showToast('Sale deleted');
+            await loadSales();
+            await loadReceivables();
+            await updateSummaryChips();
+        }
+
+        async function refreshSaleStatus(id) {
+            const sale = await db.get('sales', id);
+            if (!sale) return;
+            if (sale.paymentMethod !== 'Credit') {
+                sale.status = 'Paid';
+            } else {
+                const payments = await db.getAll('payments');
+                const received = payments
+                    .filter(payment => payment.type === 'receivable' && payment.invoiceId === id)
+                    .reduce((sum, payment) => sum + payment.amount, 0);
+                sale.status = received >= (sale.total || 0) ? 'Paid' : 'Pending';
+            }
+            await db.update('sales', sale);
         }
 
         // Purchase functions
         async function loadPurchases() {
-            const purchases = await db.getAll('purchases');
+            const [purchases, payments] = await Promise.all([
+                db.getAll('purchases'),
+                db.getAll('payments')
+            ]);
             const tbody = document.getElementById('purchasesTable');
-            
-            tbody.innerHTML = purchases.map(purchase => `
+            const searchTerm = (document.getElementById('purchaseSearch')?.value || '').toLowerCase();
+            const dateFilter = document.getElementById('purchaseDateFilter')?.value || '';
+            const statusFilter = document.getElementById('purchaseStatusFilter')?.value || '';
+
+            const enriched = purchases.map(purchase => {
+                const paid = payments
+                    .filter(payment => payment.type === 'payable' && payment.invoiceId === purchase.id)
+                    .reduce((sum, payment) => sum + payment.amount, 0);
+                const outstanding = purchase.paymentMethod === 'Credit'
+                    ? Math.max(0, (purchase.total || 0) - paid)
+                    : 0;
+                const status = outstanding === 0 ? 'Paid' : (purchase.status || (purchase.paymentMethod === 'Credit' ? 'Pending' : 'Paid'));
+                const dueDate = new Date(purchase.date);
+                dueDate.setDate(dueDate.getDate() + 30);
+                const isOverdue = outstanding > 0 && new Date() > dueDate;
+                return { ...purchase, paid, outstanding, status, isOverdue };
+            });
+
+            const filtered = enriched.filter(purchase => {
+                const matchesSearch = !searchTerm ||
+                    purchase.supplier.toLowerCase().includes(searchTerm) ||
+                    purchase.items.some(item => item.name.toLowerCase().includes(searchTerm) || item.sku.toLowerCase().includes(searchTerm));
+                const matchesDate = !dateFilter || purchase.date === dateFilter;
+                const matchesStatus = !statusFilter || purchase.status === statusFilter;
+                return matchesSearch && matchesDate && matchesStatus;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align:center; color: var(--text-secondary);">No purchases found.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(purchase => `
                 <tr>
                     <td>${formatDate(purchase.date)}</td>
                     <td>${purchase.supplier}</td>
                     <td>${purchase.items.length} items</td>
                     <td>${formatCurrency(purchase.total)}</td>
                     <td>${purchase.paymentMethod}</td>
-                    <td><span class="chip ${purchase.paymentMethod === 'Credit' ? 'warning' : 'success'}">${purchase.paymentMethod}</span></td>
+                    <td>${renderStatusChip(purchase.status, purchase.isOverdue)}</td>
                     <td>
                         <button class="btn btn-sm" onclick="viewPurchase(${purchase.id})">View</button>
+                        <button class="btn btn-sm" onclick="editPurchase(${purchase.id})">Edit</button>
                         <button class="btn danger btn-sm" onclick="deletePurchase(${purchase.id})">Delete</button>
                     </td>
                 </tr>
             `).join('');
         }
 
-        function showPurchaseModal() {
+        async function showPurchaseModal() {
             showModal('purchaseModal');
-            loadPurchaseItems();
-            document.getElementById('purchaseDate').value = new Date().toISOString().split('T')[0];
+            if (!state.editingPurchase) {
+                const previousSuppression = state.suppressAutosave;
+                state.suppressAutosave = true;
+                try {
+                    document.getElementById('purchaseForm').reset();
+                    const container = document.getElementById('purchaseItems');
+                    container.innerHTML = '';
+                    addPurchaseItem();
+                    await loadPurchaseItems();
+                } finally {
+                    state.suppressAutosave = previousSuppression;
+                }
+                const applied = await restoreFormDraft('purchaseForm');
+                const dateInput = document.getElementById('purchaseDate');
+                if (!applied || !dateInput.value) {
+                    dateInput.value = new Date().toISOString().split('T')[0];
+                }
+            } else {
+                await loadPurchaseItems();
+            }
         }
 
         async function loadPurchaseItems() {
@@ -1828,18 +3127,171 @@
             `;
             container.appendChild(newRow);
             loadPurchaseItems();
+            triggerDraftSave('purchaseForm');
         }
 
         function removePurchaseItem(button) {
             button.parentElement.remove();
+            triggerDraftSave('purchaseForm');
+        }
+
+        async function viewPurchase(id) {
+            const purchase = await db.get('purchases', id);
+            const attachments = await getAttachments('purchase', id);
+            const payments = await db.getAll('payments');
+            const linkedPayments = payments.filter(payment => payment.type === 'payable' && payment.invoiceId === id);
+            const paid = linkedPayments.reduce((sum, payment) => sum + payment.amount, 0);
+            const outstanding = purchase.paymentMethod === 'Credit'
+                ? Math.max(0, (purchase.total || 0) - paid)
+                : 0;
+
+            const content = `
+                <div class="detail-grid">
+                    <div class="detail-item"><div class="detail-label">Supplier</div><div class="detail-value">${purchase.supplier}</div></div>
+                    <div class="detail-item"><div class="detail-label">Date</div><div class="detail-value">${formatDate(purchase.date)}</div></div>
+                    <div class="detail-item"><div class="detail-label">Status</div><div class="detail-value">${renderStatusChip(purchase.status || 'Pending', outstanding > 0)}</div></div>
+                    <div class="detail-item"><div class="detail-label">Total</div><div class="detail-value">${formatCurrency(purchase.total)}</div></div>
+                    <div class="detail-item"><div class="detail-label">Outstanding</div><div class="detail-value">${formatCurrency(outstanding)}</div></div>
+                </div>
+                <h4 style="margin-bottom: 0.75rem;">Items</h4>
+                <table class="table" style="margin-bottom: 1.5rem;">
+                    <thead><tr><th>SKU</th><th>Name</th><th>Qty</th><th>Cost</th><th>Total</th></tr></thead>
+                    <tbody>
+                        ${purchase.items.map(item => `
+                            <tr>
+                                <td>${item.sku}</td>
+                                <td>${item.name}</td>
+                                <td>${item.qty}</td>
+                                <td>${formatCurrency(item.cost)}</td>
+                                <td>${formatCurrency(item.total)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <h4 style="margin-bottom: 0.75rem;">Payments</h4>
+                ${linkedPayments.length ? `
+                    <table class="table" style="margin-bottom: 1.5rem;">
+                        <thead><tr><th>Date</th><th>Method</th><th>Amount</th><th>Notes</th></tr></thead>
+                        <tbody>
+                            ${linkedPayments.map(payment => `
+                                <tr>
+                                    <td>${formatDate(payment.date)}</td>
+                                    <td>${payment.method}</td>
+                                    <td>${formatCurrency(payment.amount)}</td>
+                                    <td>${payment.notes || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                ` : '<p style="color: var(--text-secondary);">No supplier payments recorded.</p>'}
+                <h4 style="margin-bottom: 0.75rem;">Attachments</h4>
+                ${renderAttachments(attachments)}
+            `;
+            showDetails('Purchase Details', content);
+        }
+
+        async function editPurchase(id) {
+            const purchase = await db.get('purchases', id);
+            state.editingPurchase = purchase;
+            const previousSuppression = state.suppressAutosave;
+            state.suppressAutosave = true;
+            try {
+                document.getElementById('purchaseSupplier').value = purchase.supplier;
+                document.getElementById('purchaseDate').value = purchase.date;
+                document.getElementById('purchasePaymentMethod').value = purchase.paymentMethod;
+
+                const container = document.getElementById('purchaseItems');
+                container.innerHTML = '';
+
+                purchase.items.forEach(() => addPurchaseItem());
+                await loadPurchaseItems();
+
+                const rows = container.querySelectorAll('.purchase-item-row');
+                purchase.items.forEach((item, index) => {
+                    const row = rows[index];
+                    row.querySelector('.purchase-item-select').value = item.itemId;
+                    row.querySelector('.purchase-qty').value = item.qty;
+                    row.querySelector('.purchase-cost').value = item.cost;
+                });
+
+                document.getElementById('purchaseAttachment').value = '';
+            } finally {
+                state.suppressAutosave = previousSuppression;
+            }
+            showModal('purchaseModal');
+        }
+
+        async function deletePurchase(id) {
+            if (!confirm('Delete this purchase record? Inventory will be adjusted.')) return;
+
+            const purchase = await db.get('purchases', id);
+            if (!purchase) return;
+
+            for (const item of purchase.items) {
+                const inventoryItem = await db.get('inventory', item.itemId);
+                if (inventoryItem) {
+                    inventoryItem.stock = Math.max(0, (inventoryItem.stock || 0) - item.qty);
+                    await db.update('inventory', inventoryItem);
+                }
+            }
+
+            const payments = await db.getAll('payments');
+            const related = payments.filter(payment => payment.type === 'payable' && payment.invoiceId === id);
+            for (const payment of related) {
+                await db.delete('payments', payment.id);
+            }
+
+            await deleteAttachments('purchase', id);
+            await db.delete('purchases', id);
+
+            showToast('Purchase deleted');
+            await loadPurchases();
+            await loadPayables();
+            await updateSummaryChips();
+        }
+
+        async function refreshPurchaseStatus(id) {
+            const purchase = await db.get('purchases', id);
+            if (!purchase) return;
+            if (purchase.paymentMethod !== 'Credit') {
+                purchase.status = 'Paid';
+            } else {
+                const payments = await db.getAll('payments');
+                const paid = payments
+                    .filter(payment => payment.type === 'payable' && payment.invoiceId === id)
+                    .reduce((sum, payment) => sum + payment.amount, 0);
+                purchase.status = paid >= (purchase.total || 0) ? 'Paid' : 'Pending';
+            }
+            await db.update('purchases', purchase);
         }
 
         // Expense functions
         async function loadExpenses() {
             const expenses = await db.getAll('expenses');
             const tbody = document.getElementById('expensesTable');
-            
-            tbody.innerHTML = expenses.map(expense => `
+            const searchTerm = (document.getElementById('expenseSearch')?.value || '').toLowerCase();
+            const dateFilter = document.getElementById('expenseDateFilter')?.value || '';
+            const categoryFilter = document.getElementById('expenseCategoryFilter')?.value || '';
+
+            const filtered = expenses.filter(expense => {
+                const matchesSearch = !searchTerm ||
+                    expense.description.toLowerCase().includes(searchTerm) ||
+                    (expense.party || '').toLowerCase().includes(searchTerm);
+                const matchesDate = !dateFilter || expense.date === dateFilter;
+                const matchesCategory = !categoryFilter || expense.category === categoryFilter;
+                return matchesSearch && matchesDate && matchesCategory;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align:center; color: var(--text-secondary);">No expenses found.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(expense => `
                 <tr>
                     <td>${formatDate(expense.date)}</td>
                     <td>${expense.category}</td>
@@ -1847,6 +3299,7 @@
                     <td>${formatCurrency(expense.amount)}</td>
                     <td>${expense.paymentMethod}</td>
                     <td>
+                        <button class="btn btn-sm" onclick="viewExpense(${expense.id})">View</button>
                         <button class="btn btn-sm" onclick="editExpense(${expense.id})">Edit</button>
                         <button class="btn danger btn-sm" onclick="deleteExpense(${expense.id})">Delete</button>
                     </td>
@@ -1854,9 +3307,57 @@
             `).join('');
         }
 
-        function showExpenseModal() {
+        async function showExpenseModal() {
             showModal('expenseModal');
-            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('expenseForm').reset();
+            const applied = await restoreFormDraft('expenseForm');
+            const dateInput = document.getElementById('expenseDate');
+            if (!applied || !dateInput.value) {
+                dateInput.value = new Date().toISOString().split('T')[0];
+            }
+        }
+
+        async function viewExpense(id) {
+            const expense = await db.get('expenses', id);
+            const attachments = await getAttachments('expense', id);
+            const content = `
+                <div class="detail-grid">
+                    <div class="detail-item"><div class="detail-label">Date</div><div class="detail-value">${formatDate(expense.date)}</div></div>
+                    <div class="detail-item"><div class="detail-label">Category</div><div class="detail-value">${expense.category}</div></div>
+                    <div class="detail-item"><div class="detail-label">Amount</div><div class="detail-value">${formatCurrency(expense.amount)}</div></div>
+                    <div class="detail-item"><div class="detail-label">Payment Method</div><div class="detail-value">${expense.paymentMethod}</div></div>
+                    <div class="detail-item"><div class="detail-label">Party</div><div class="detail-value">${expense.party || '-'}</div></div>
+                </div>
+                <p style="margin-bottom: 1rem; color: var(--text-secondary);">${expense.description}</p>
+                <h4 style="margin-bottom: 0.75rem;">Attachments</h4>
+                ${renderAttachments(attachments)}
+            `;
+            showDetails('Expense Details', content);
+        }
+
+        async function editExpense(id) {
+            const expense = await db.get('expenses', id);
+            state.editingExpense = expense;
+
+            document.getElementById('expenseDate').value = expense.date;
+            document.getElementById('expenseCategory').value = expense.category;
+            document.getElementById('expenseDescription').value = expense.description;
+            document.getElementById('expenseAmount').value = expense.amount;
+            document.getElementById('expensePaymentMethod').value = expense.paymentMethod;
+            document.getElementById('expenseParty').value = expense.party || '';
+
+            document.getElementById('expenseAttachment').value = '';
+            showModal('expenseModal');
+        }
+
+        async function deleteExpense(id) {
+            if (!confirm('Delete this expense record?')) return;
+
+            await deleteAttachments('expense', id);
+            await db.delete('expenses', id);
+            showToast('Expense deleted');
+            await loadExpenses();
+            await updateSummaryChips();
         }
 
         // Loan functions
@@ -1886,9 +3387,14 @@
             document.getElementById('totalLoanBalance').textContent = formatCurrency(balance);
         }
 
-        function showLoanModal() {
+        async function showLoanModal() {
             showModal('loanModal');
-            document.getElementById('loanDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('loanForm').reset();
+            const applied = await restoreFormDraft('loanForm');
+            const dateInput = document.getElementById('loanDate');
+            if (!applied || !dateInput.value) {
+                dateInput.value = new Date().toISOString().split('T')[0];
+            }
         }
 
         // Payables and Receivables functions
@@ -1968,15 +3474,26 @@
             `).join('');
         }
 
-        function showPaymentModal(type) {
+        async function showPaymentModal(type, prefillInvoice = null) {
             state.paymentType = type;
-            const modal = document.getElementById('paymentModal');
-            const title = document.getElementById('paymentModalTitle');
-            
-            title.textContent = type === 'payable' ? 'Record Payment' : 'Record Receipt';
-            loadPaymentInvoices(type);
             showModal('paymentModal');
-            document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('paymentForm').reset();
+            const applied = await restoreFormDraft('paymentForm', { expectedType: type });
+            if (!applied) {
+                await loadPaymentInvoices(type);
+            }
+
+            const title = document.getElementById('paymentModalTitle');
+            title.textContent = (state.paymentType || type) === 'payable' ? 'Record Payment' : 'Record Receipt';
+
+            const dateInput = document.getElementById('paymentDate');
+            if (!dateInput.value) {
+                dateInput.value = new Date().toISOString().split('T')[0];
+            }
+
+            if (prefillInvoice) {
+                document.getElementById('paymentInvoice').value = String(prefillInvoice);
+            }
         }
 
         async function loadPaymentInvoices(type) {
@@ -2008,20 +3525,18 @@
         }
 
         function recordPayment(invoiceId, type) {
-            state.paymentType = type;
-            document.getElementById('paymentInvoice').value = invoiceId;
-            showPaymentModal(type);
+            showPaymentModal(type, invoiceId);
         }
 
         // Banking functions
         async function loadBanking() {
             const transfers = await db.getAll('transfers');
             const tbody = document.getElementById('bankingTable');
-            
+
             tbody.innerHTML = transfers.map(transfer => `
                 <tr>
                     <td>${formatDate(transfer.date)}</td>
-                    <td>Transfer</td>
+                    <td>${formatTransferType(transfer.type)}</td>
                     <td>${transfer.description || 'Fund Transfer'}</td>
                     <td>${transfer.from}</td>
                     <td>${transfer.to}</td>
@@ -2034,9 +3549,15 @@
             document.getElementById('bankBalance').textContent = formatCurrency(state.bank);
         }
 
-        function showTransferModal() {
+        async function showTransferModal() {
             showModal('transferModal');
-            document.getElementById('transferDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('transferForm').reset();
+            applySettingsToUI();
+            const applied = await restoreFormDraft('transferForm');
+            const dateInput = document.getElementById('transferDate');
+            if (!applied || !dateInput.value) {
+                dateInput.value = new Date().toISOString().split('T')[0];
+            }
         }
 
         // Form handlers
@@ -2062,7 +3583,8 @@
                     await db.add('inventory', formData);
                     showToast('Item added successfully');
                 }
-                
+
+                await clearFormDraft('inventoryForm');
                 closeModal('inventoryModal');
                 await loadInventory();
             } catch (error) {
@@ -2072,46 +3594,50 @@
 
         document.getElementById('salesForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const items = [];
             const itemRows = document.querySelectorAll('.sale-item-row');
-            
+
             for (const row of itemRows) {
                 const itemId = parseInt(row.querySelector('.sale-item-select').value);
                 const qty = parseInt(row.querySelector('.sale-qty').value);
                 const price = parseFloat(row.querySelector('.sale-price').value);
-                
+
                 if (itemId && qty && price) {
-                    const item = await db.get('inventory', itemId);
-                    
-                    if (item.stock < qty) {
-                        showToast(`Insufficient stock for ${item.name}. Available: ${item.stock}`, 'error');
+                    const inventoryItem = await db.get('inventory', itemId);
+                    if (!inventoryItem) {
+                        showToast('Selected inventory item no longer exists.', 'error');
                         return;
                     }
-                    
+
+                    const originalQty = state.editingSale ? (state.editingSale.items.find(i => i.itemId === itemId)?.qty || 0) : 0;
+                    if ((inventoryItem.stock + originalQty) < qty) {
+                        showToast(`Insufficient stock for ${inventoryItem.name}. Available: ${inventoryItem.stock + originalQty}`, 'error');
+                        return;
+                    }
+
                     items.push({
                         itemId,
-                        name: item.name,
-                        sku: item.sku,
+                        name: inventoryItem.name,
+                        sku: inventoryItem.sku,
                         qty,
                         price,
                         total: qty * price
                     });
                 }
             }
-            
+
             if (items.length === 0) {
                 showToast('Please add at least one item', 'error');
                 return;
             }
-            
+
             const subtotal = items.reduce((sum, item) => sum + item.total, 0);
             const discount = parseFloat(document.getElementById('saleDiscount').value) || 0;
             const shipping = parseFloat(document.getElementById('saleShipping').value) || 0;
             const total = subtotal - discount + shipping;
-            
+
             const saleData = {
-                invoiceNumber: 'INV-' + Date.now(),
                 customer: document.getElementById('saleCustomer').value,
                 date: document.getElementById('saleDate').value,
                 items,
@@ -2119,41 +3645,81 @@
                 discount,
                 shipping,
                 total,
-                paymentMethod: document.getElementById('salePaymentMethod').value
+                paymentMethod: document.getElementById('salePaymentMethod').value,
+                status: document.getElementById('salePaymentMethod').value === 'Credit' ? 'Pending' : 'Paid'
             };
-            
+
+            const attachmentFile = document.getElementById('saleAttachment').files[0];
+
             try {
-                await db.add('sales', saleData);
-                
-                // Update inventory
-                for (const item of items) {
-                    const inventoryItem = await db.get('inventory', item.itemId);
-                    inventoryItem.stock -= item.qty;
-                    await db.update('inventory', inventoryItem);
+                let saleId;
+                const originalItems = state.editingSale ? state.editingSale.items : [];
+                const originalMap = new Map(originalItems.map(item => [item.itemId, item.qty]));
+
+                if (state.editingSale) {
+                    saleData.id = state.editingSale.id;
+                    saleData.invoiceNumber = state.editingSale.invoiceNumber;
+                    await db.update('sales', saleData);
+                    saleId = state.editingSale.id;
+                } else {
+                    saleData.invoiceNumber = 'INV-' + Date.now();
+                    saleId = await db.add('sales', saleData);
+                    saleData.id = saleId;
                 }
-                
-                showToast('Sale recorded successfully');
+
+                for (const item of items) {
+                    const originalQty = originalMap.get(item.itemId) || 0;
+                    const delta = item.qty - originalQty;
+                    const inventoryItem = await db.get('inventory', item.itemId);
+                    inventoryItem.stock -= delta;
+                    await db.update('inventory', inventoryItem);
+                    originalMap.delete(item.itemId);
+                }
+
+                for (const [itemId, qty] of originalMap.entries()) {
+                    const inventoryItem = await db.get('inventory', itemId);
+                    if (inventoryItem) {
+                        inventoryItem.stock += qty;
+                        await db.update('inventory', inventoryItem);
+                    }
+                }
+
+                if (attachmentFile) {
+                    await saveAttachment('sale', saleData.id, attachmentFile);
+                    document.getElementById('saleAttachment').value = '';
+                }
+
+                await refreshSaleStatus(saleData.id);
+
+                await clearFormDraft('salesForm');
+                showToast(state.editingSale ? 'Sale updated successfully' : 'Sale recorded successfully');
                 closeModal('salesModal');
                 await loadSales();
+                await loadReceivables();
                 await updateSummaryChips();
             } catch (error) {
-                showToast('Error recording sale: ' + error.message, 'error');
+                showToast('Error saving sale: ' + error.message, 'error');
             }
         });
 
         document.getElementById('purchaseForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const items = [];
             const itemRows = document.querySelectorAll('.purchase-item-row');
-            
+
             for (const row of itemRows) {
                 const itemId = parseInt(row.querySelector('.purchase-item-select').value);
                 const qty = parseInt(row.querySelector('.purchase-qty').value);
                 const cost = parseFloat(row.querySelector('.purchase-cost').value);
-                
+
                 if (itemId && qty && cost) {
                     const item = await db.get('inventory', itemId);
+                    if (!item) {
+                        showToast('Selected inventory item no longer exists.', 'error');
+                        return;
+                    }
+
                     items.push({
                         itemId,
                         name: item.name,
@@ -2164,44 +3730,88 @@
                     });
                 }
             }
-            
+
             if (items.length === 0) {
                 showToast('Please add at least one item', 'error');
                 return;
             }
-            
+
             const total = items.reduce((sum, item) => sum + item.total, 0);
-            
+
             const purchaseData = {
                 supplier: document.getElementById('purchaseSupplier').value,
                 date: document.getElementById('purchaseDate').value,
                 items,
                 total,
-                paymentMethod: document.getElementById('purchasePaymentMethod').value
+                paymentMethod: document.getElementById('purchasePaymentMethod').value,
+                status: document.getElementById('purchasePaymentMethod').value === 'Credit' ? 'Pending' : 'Paid'
             };
-            
+
+            const attachmentFile = document.getElementById('purchaseAttachment').files[0];
+
             try {
-                await db.add('purchases', purchaseData);
-                
-                // Update inventory
+                let purchaseId;
+                const originalItems = state.editingPurchase ? state.editingPurchase.items : [];
+                const originalMap = new Map(originalItems.map(item => [item.itemId, item.qty]));
+                const adjustments = [];
+
                 for (const item of items) {
+                    const originalQty = originalMap.get(item.itemId) || 0;
+                    const delta = item.qty - originalQty;
                     const inventoryItem = await db.get('inventory', item.itemId);
-                    inventoryItem.stock += item.qty;
+                    if (inventoryItem.stock + delta < 0) {
+                        showToast(`Cannot reduce ${inventoryItem.name} below zero stock.`, 'error');
+                        return;
+                    }
+                    adjustments.push({ inventoryItem, delta });
+                    originalMap.delete(item.itemId);
+                }
+
+                for (const [itemId, qty] of originalMap.entries()) {
+                    const inventoryItem = await db.get('inventory', itemId);
+                    const delta = -qty;
+                    if (inventoryItem.stock + delta < 0) {
+                        showToast(`Cannot edit. ${inventoryItem.name} stock is already used.`, 'error');
+                        return;
+                    }
+                    adjustments.push({ inventoryItem, delta });
+                }
+
+                if (state.editingPurchase) {
+                    purchaseData.id = state.editingPurchase.id;
+                    await db.update('purchases', purchaseData);
+                    purchaseId = state.editingPurchase.id;
+                } else {
+                    purchaseId = await db.add('purchases', purchaseData);
+                    purchaseData.id = purchaseId;
+                }
+
+                for (const { inventoryItem, delta } of adjustments) {
+                    inventoryItem.stock += delta;
                     await db.update('inventory', inventoryItem);
                 }
-                
-                showToast('Purchase recorded successfully');
+
+                if (attachmentFile) {
+                    await saveAttachment('purchase', purchaseData.id, attachmentFile);
+                    document.getElementById('purchaseAttachment').value = '';
+                }
+
+                await refreshPurchaseStatus(purchaseData.id);
+
+                await clearFormDraft('purchaseForm');
+                showToast(state.editingPurchase ? 'Purchase updated successfully' : 'Purchase recorded successfully');
                 closeModal('purchaseModal');
                 await loadPurchases();
+                await loadPayables();
                 await updateSummaryChips();
             } catch (error) {
-                showToast('Error recording purchase: ' + error.message, 'error');
+                showToast('Error saving purchase: ' + error.message, 'error');
             }
         });
 
         document.getElementById('expenseForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const expenseData = {
                 date: document.getElementById('expenseDate').value,
                 category: document.getElementById('expenseCategory').value,
@@ -2210,10 +3820,24 @@
                 paymentMethod: document.getElementById('expensePaymentMethod').value,
                 party: document.getElementById('expenseParty').value
             };
-            
+
+            const attachmentFile = document.getElementById('expenseAttachment').files[0];
+
             try {
-                await db.add('expenses', expenseData);
-                showToast('Expense recorded successfully');
+                if (state.editingExpense) {
+                    expenseData.id = state.editingExpense.id;
+                    await db.update('expenses', expenseData);
+                } else {
+                    expenseData.id = await db.add('expenses', expenseData);
+                }
+
+                if (attachmentFile) {
+                    await saveAttachment('expense', expenseData.id, attachmentFile);
+                    document.getElementById('expenseAttachment').value = '';
+                }
+
+                await clearFormDraft('expenseForm');
+                showToast(state.editingExpense ? 'Expense updated successfully' : 'Expense recorded successfully');
                 closeModal('expenseModal');
                 await loadExpenses();
                 await updateSummaryChips();
@@ -2234,6 +3858,7 @@
             
             try {
                 await db.add('loans', loanData);
+                await clearFormDraft('loanForm');
                 showToast('Loan transaction recorded successfully');
                 closeModal('loanModal');
                 await loadLoans();
@@ -2257,15 +3882,20 @@
             
             try {
                 await db.add('payments', paymentData);
+                await clearFormDraft('paymentForm');
                 showToast('Payment recorded successfully');
                 closeModal('paymentModal');
-                
+
                 if (state.paymentType === 'payable') {
+                    await refreshPurchaseStatus(paymentData.invoiceId);
+                    await loadPurchases();
                     await loadPayables();
                 } else {
+                    await refreshSaleStatus(paymentData.invoiceId);
+                    await loadSales();
                     await loadReceivables();
                 }
-                
+
                 await updateSummaryChips();
             } catch (error) {
                 showToast('Error recording payment: ' + error.message, 'error');
@@ -2274,36 +3904,64 @@
 
         document.getElementById('transferForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
+            const transferType = document.getElementById('transferType').value;
             const from = document.getElementById('transferFrom').value;
             const to = document.getElementById('transferTo').value;
             const amount = parseFloat(document.getElementById('transferAmount').value);
-            
+
+            if (!transferType) {
+                showToast('Select a transfer type.', 'error');
+                return;
+            }
+
             if (from === to) {
                 showToast('Source and destination cannot be the same', 'error');
                 return;
             }
-            
-            if (from === 'Cash' && amount > state.cash) {
+
+            const isFromCash = from === 'Cash';
+            const isFromBank = from.startsWith('Bank');
+            const isToCash = to === 'Cash';
+            const isToBank = to.startsWith('Bank');
+
+            if (isFromCash && amount > state.cash) {
                 showToast('Insufficient cash balance', 'error');
                 return;
             }
-            
-            if (from === 'Bank' && amount > state.bank) {
+
+            if (isFromBank && amount > state.bank) {
                 showToast('Insufficient bank balance', 'error');
                 return;
             }
-            
+
+            if (transferType === 'cash-to-bank' && (!isFromCash || !isToBank)) {
+                showToast('Cash ➜ Bank transfer requires selecting Cash as source and a bank as destination.', 'error');
+                return;
+            }
+
+            if (transferType === 'bank-to-cash' && (!isFromBank || !isToCash)) {
+                showToast('Bank ➜ Cash transfer requires selecting a bank as source and Cash as destination.', 'error');
+                return;
+            }
+
+            if (transferType === 'bank-to-bank' && (!isFromBank || !isToBank)) {
+                showToast('Bank ➜ Bank transfer requires selecting banks for both accounts.', 'error');
+                return;
+            }
+
             const transferData = {
                 date: document.getElementById('transferDate').value,
+                type: transferType,
                 from,
                 to,
                 amount,
                 description: document.getElementById('transferDescription').value
             };
-            
+
             try {
                 await db.add('transfers', transferData);
+                await clearFormDraft('transferForm');
                 showToast('Transfer recorded successfully');
                 closeModal('transferModal');
                 await loadBanking();
@@ -2336,14 +3994,16 @@
                         date: '2024-01-15',
                         items: [{ itemId: 1, name: 'Cotton T-Shirt', sku: 'SHIRT001', qty: 50, cost: 500, total: 25000 }],
                         total: 25000,
-                        paymentMethod: 'Cash'
+                        paymentMethod: 'Cash',
+                        status: 'Paid'
                     },
                     {
                         supplier: 'XYZ Garments',
                         date: '2024-01-20',
                         items: [{ itemId: 2, name: 'Jeans', sku: 'PANTS001', qty: 30, cost: 1200, total: 36000 }],
                         total: 36000,
-                        paymentMethod: 'Credit'
+                        paymentMethod: 'Credit',
+                        status: 'Pending'
                     }
                 ];
                 
@@ -2362,7 +4022,8 @@
                         discount: 0,
                         shipping: 150,
                         total: 1750,
-                        paymentMethod: 'Cash'
+                        paymentMethod: 'Cash',
+                        status: 'Paid'
                     },
                     {
                         invoiceNumber: 'INV-002',
@@ -2373,7 +4034,8 @@
                         discount: 100,
                         shipping: 200,
                         total: 2100,
-                        paymentMethod: 'Bank'
+                        paymentMethod: 'Bank',
+                        status: 'Paid'
                     }
                 ];
                 
@@ -2407,20 +4069,58 @@
         }
 
         // Backup and export functions
+        async function restoreBackupData(backup, { preserveAutosaveHandle = true, skipAutosave = false } = {}) {
+            if (!backup || !backup.data) {
+                throw new Error('Invalid backup file format');
+            }
+
+            const stores = ['inventory', 'sales', 'purchases', 'expenses', 'loans', 'payments', 'transfers', 'attachments', 'formDrafts'];
+            const settingsData = Array.isArray(backup.data.settings) ? backup.data.settings : [];
+            const preservedHandle = preserveAutosaveHandle ? state.autosave.handle : null;
+            const preservedName = preserveAutosaveHandle ? state.autosave.fileName : null;
+
+            state.importingFromFile = true;
+            db.setPreserveTimestamps(true);
+
+            try {
+                for (const store of stores) {
+                    await db.clear(store);
+                }
+
+                await db.clear('settings');
+
+                for (const entry of settingsData) {
+                    if (entry.key === 'autosaveFileHandle') continue;
+                    await db.update('settings', entry);
+                }
+
+                if (preservedHandle) {
+                    await db.update('settings', { key: 'autosaveFileHandle', value: preservedHandle });
+                }
+                if (preservedName) {
+                    await db.update('settings', { key: 'autosaveFileName', value: preservedName });
+                }
+
+                for (const store of stores) {
+                    const records = Array.isArray(backup.data[store]) ? backup.data[store] : [];
+                    for (const record of records) {
+                        await db.add(store, record);
+                    }
+                }
+            } finally {
+                db.setPreserveTimestamps(false);
+                state.importingFromFile = false;
+            }
+
+            if (!skipAutosave) {
+                scheduleRealtimeSave('restore');
+            }
+        }
+
         async function exportBackup() {
             try {
-                const backup = {
-                    version: '1.0',
-                    timestamp: new Date().toISOString(),
-                    data: {}
-                };
-                
-                const stores = ['inventory', 'sales', 'purchases', 'expenses', 'loans', 'payments', 'transfers', 'attachments', 'settings'];
-                
-                for (const store of stores) {
-                    backup.data[store] = await db.getAll(store);
-                }
-                
+                const backup = await buildBackupObject();
+
                 const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -2430,7 +4130,7 @@
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                
+
                 showToast('Backup exported successfully');
             } catch (error) {
                 showToast('Error exporting backup: ' + error.message, 'error');
@@ -2458,23 +4158,10 @@
                     throw new Error('Invalid backup file format');
                 }
                 
-                // Clear existing data
-                const stores = ['inventory', 'sales', 'purchases', 'expenses', 'loans', 'payments', 'transfers', 'attachments', 'settings'];
-                for (const store of stores) {
-                    await db.clear(store);
-                }
-                
-                // Import backup data
-                for (const [store, data] of Object.entries(backup.data)) {
-                    if (Array.isArray(data)) {
-                        for (const item of data) {
-                            await db.add(store, item);
-                        }
-                    }
-                }
-                
+                await restoreBackupData(backup, { preserveAutosaveHandle: true, skipAutosave: false });
                 showToast('Backup imported successfully');
                 closeModal('backupModal');
+                await loadSettings({ skipAutosaveReconnect: true });
                 await loadPageData(state.currentPage);
                 await updateSummaryChips();
             } catch (error) {
@@ -2497,7 +4184,7 @@
             }
             
             try {
-                const stores = ['inventory', 'sales', 'purchases', 'expenses', 'loans', 'payments', 'transfers', 'attachments'];
+                const stores = ['inventory', 'sales', 'purchases', 'expenses', 'loans', 'payments', 'transfers', 'attachments', 'formDrafts'];
                 for (const store of stores) {
                     await db.clear(store);
                 }
@@ -2536,6 +4223,45 @@
             });
         }
 
+        function exportReportCSV(type) {
+            const output = document.getElementById('reportOutput');
+            if (!output || !output.innerHTML.trim()) {
+                showToast('Generate a report before exporting.', 'error');
+                return;
+            }
+
+            const tables = output.querySelectorAll('table');
+            if (!tables.length) {
+                showToast('Nothing to export from the current report.', 'error');
+                return;
+            }
+
+            const sections = [];
+            tables.forEach((table, index) => {
+                const rows = Array.from(table.querySelectorAll('tr')).map(row => {
+                    const cells = Array.from(row.querySelectorAll('th, td')).map(cell => {
+                        const text = cell.textContent.replace(/\s+/g, ' ').trim().replace(/"/g, '""');
+                        return `"${text}"`;
+                    });
+                    return cells.join(',');
+                });
+                sections.push(`Section ${index + 1}`, rows.join('\n'));
+            });
+
+            const csvContent = sections.join('\n');
+            const fromDate = document.getElementById('reportFromDate').value || 'all';
+            const toDate = document.getElementById('reportToDate').value || 'all';
+            const filename = `${type}-${fromDate}-to-${toDate}.csv`;
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
         // Reports function
         async function generateReport() {
             const fromDate = document.getElementById('reportFromDate').value;
@@ -2568,6 +4294,9 @@
                         break;
                     case 'inventory-valuation':
                         await generateInventoryValuation(output);
+                        break;
+                    case 'business-overview':
+                        await generateBusinessOverviewReport(fromDate, toDate, output);
                         break;
                 }
             } catch (error) {
@@ -2836,7 +4565,7 @@
 
         async function generateInventoryValuation(output) {
             const inventory = await db.getAll('inventory');
-            
+
             let totalValue = 0;
             const valuedInventory = inventory.map(item => {
                 const value = item.stock * item.costPrice;
@@ -2885,39 +4614,210 @@
             `;
         }
 
+        async function generateBusinessOverviewReport(fromDate, toDate, output) {
+            const [sales, purchases, expenses, payments, inventory] = await Promise.all([
+                db.getAll('sales'),
+                db.getAll('purchases'),
+                db.getAll('expenses'),
+                db.getAll('payments'),
+                db.getAll('inventory')
+            ]);
+
+            const filteredSales = sales.filter(sale => sale.date >= fromDate && sale.date <= toDate);
+            const filteredPurchases = purchases.filter(purchase => purchase.date >= fromDate && purchase.date <= toDate);
+            const filteredExpenses = expenses.filter(expense => expense.date >= fromDate && expense.date <= toDate);
+
+            const revenue = filteredSales.reduce((sum, sale) => sum + sale.total, 0);
+            const cogs = filteredPurchases.reduce((sum, purchase) => sum + purchase.total, 0);
+            const expenseTotal = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const grossProfit = revenue - cogs;
+            const netProfit = grossProfit - expenseTotal;
+
+            const receivableBalance = sales.reduce((sum, sale) => {
+                if (sale.paymentMethod !== 'Credit') return sum;
+                const received = payments
+                    .filter(payment => payment.type === 'receivable' && payment.invoiceId === sale.id)
+                    .reduce((acc, payment) => acc + payment.amount, 0);
+                return sum + Math.max(0, (sale.total || 0) - received);
+            }, 0);
+
+            const payableBalance = purchases.reduce((sum, purchase) => {
+                if (purchase.paymentMethod !== 'Credit') return sum;
+                const paid = payments
+                    .filter(payment => payment.type === 'payable' && payment.invoiceId === purchase.id)
+                    .reduce((acc, payment) => acc + payment.amount, 0);
+                return sum + Math.max(0, (purchase.total || 0) - paid);
+            }, 0);
+
+            const inventoryValue = inventory.reduce((sum, item) => sum + (item.stock * item.costPrice), 0);
+
+            const topCustomers = filteredSales.reduce((acc, sale) => {
+                acc[sale.customer] = (acc[sale.customer] || 0) + sale.total;
+                return acc;
+            }, {});
+
+            const topVendors = filteredPurchases.reduce((acc, purchase) => {
+                acc[purchase.supplier] = (acc[purchase.supplier] || 0) + purchase.total;
+                return acc;
+            }, {});
+
+            output.innerHTML = `
+                <div class="card">
+                    <h3>Business Overview</h3>
+                    <p><strong>Period:</strong> ${formatDate(fromDate)} to ${formatDate(toDate)}</p>
+
+                    <div class="detail-grid">
+                        <div class="detail-item"><div class="detail-label">Total Revenue</div><div class="detail-value">${formatCurrency(revenue)}</div></div>
+                        <div class="detail-item"><div class="detail-label">Cost of Goods</div><div class="detail-value">${formatCurrency(cogs)}</div></div>
+                        <div class="detail-item"><div class="detail-label">Operating Expenses</div><div class="detail-value">${formatCurrency(expenseTotal)}</div></div>
+                        <div class="detail-item"><div class="detail-label">Gross Profit</div><div class="detail-value">${formatCurrency(grossProfit)}</div></div>
+                        <div class="detail-item"><div class="detail-label">Net Profit</div><div class="detail-value">${formatCurrency(netProfit)}</div></div>
+                        <div class="detail-item"><div class="detail-label">Inventory Value</div><div class="detail-value">${formatCurrency(inventoryValue)}</div></div>
+                        <div class="detail-item"><div class="detail-label">Outstanding Receivables</div><div class="detail-value">${formatCurrency(receivableBalance)}</div></div>
+                        <div class="detail-item"><div class="detail-label">Outstanding Payables</div><div class="detail-value">${formatCurrency(payableBalance)}</div></div>
+                    </div>
+
+                    <table class="table" style="margin: 1.5rem 0;">
+                        <thead><tr><th>Metric</th><th>Value</th></tr></thead>
+                        <tbody>
+                            <tr><td>Total Revenue</td><td>${formatCurrency(revenue)}</td></tr>
+                            <tr><td>Cost of Goods</td><td>${formatCurrency(cogs)}</td></tr>
+                            <tr><td>Operating Expenses</td><td>${formatCurrency(expenseTotal)}</td></tr>
+                            <tr><td>Gross Profit</td><td>${formatCurrency(grossProfit)}</td></tr>
+                            <tr><td>Net Profit</td><td>${formatCurrency(netProfit)}</td></tr>
+                            <tr><td>Inventory Value</td><td>${formatCurrency(inventoryValue)}</td></tr>
+                            <tr><td>Outstanding Receivables</td><td>${formatCurrency(receivableBalance)}</td></tr>
+                            <tr><td>Outstanding Payables</td><td>${formatCurrency(payableBalance)}</td></tr>
+                        </tbody>
+                    </table>
+
+                    <h4 style="margin-top: 1.5rem;">Top Customers</h4>
+                    <table class="table">
+                        <thead><tr><th>Customer</th><th>Total Sales</th></tr></thead>
+                        <tbody>
+                            ${Object.entries(topCustomers).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([customer, total]) => `
+                                <tr>
+                                    <td>${customer}</td>
+                                    <td>${formatCurrency(total)}</td>
+                                </tr>
+                            `).join('') || '<tr><td colspan="2" style="text-align:center; color: var(--text-secondary);">No sales in period</td></tr>'}
+                        </tbody>
+                    </table>
+
+                    <h4 style="margin-top: 1.5rem;">Top Vendors</h4>
+                    <table class="table">
+                        <thead><tr><th>Vendor</th><th>Total Purchases</th></tr></thead>
+                        <tbody>
+                            ${Object.entries(topVendors).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([vendor, total]) => `
+                                <tr>
+                                    <td>${vendor}</td>
+                                    <td>${formatCurrency(total)}</td>
+                                </tr>
+                            `).join('') || '<tr><td colspan="2" style="text-align:center; color: var(--text-secondary);">No purchases in period</td></tr>'}
+                        </tbody>
+                    </table>
+
+                    <button class="btn" onclick="exportReportCSV('business-overview')">Export Summary</button>
+                </div>
+            `;
+        }
+
         // Settings functions
         async function saveSettings() {
             const settings = {
                 businessName: document.getElementById('businessName').value,
                 defaultCurrency: document.getElementById('defaultCurrency').value,
                 valuationMethod: document.getElementById('valuationMethod').value,
-                backupFrequency: document.getElementById('backupFrequency').value
+                backupFrequency: document.getElementById('backupFrequency').value,
+                inventoryCategories: parseListInput(document.getElementById('inventoryCategories').value, state.settingsCache.inventoryCategories),
+                expenseCategories: parseListInput(document.getElementById('expenseCategories').value, state.settingsCache.expenseCategories),
+                vendorNames: parseListInput(document.getElementById('vendorNames').value, state.settingsCache.vendorNames),
+                bankNames: parseListInput(document.getElementById('bankNames').value, state.settingsCache.bankNames)
             };
-            
+
             try {
                 for (const [key, value] of Object.entries(settings)) {
                     await db.update('settings', { key, value });
                 }
+                state.settingsCache = {
+                    inventoryCategories: settings.inventoryCategories,
+                    expenseCategories: settings.expenseCategories,
+                    vendorNames: settings.vendorNames,
+                    bankNames: settings.bankNames
+                };
+                applySettingsToUI();
+                await loadInventory();
+                await loadExpenses();
+                await loadPurchases();
+                await loadSales();
                 showToast('Settings saved successfully');
             } catch (error) {
                 showToast('Error saving settings: ' + error.message, 'error');
             }
         }
 
-        async function loadSettings() {
+        async function loadSettings(options = {}) {
+            const { skipAutosaveReconnect = false } = options;
             try {
                 const settings = await db.getAll('settings');
                 const settingsObj = {};
                 settings.forEach(setting => {
                     settingsObj[setting.key] = setting.value;
                 });
-                
+
                 if (settingsObj.businessName) document.getElementById('businessName').value = settingsObj.businessName;
                 if (settingsObj.defaultCurrency) document.getElementById('defaultCurrency').value = settingsObj.defaultCurrency;
                 if (settingsObj.valuationMethod) document.getElementById('valuationMethod').value = settingsObj.valuationMethod;
                 if (settingsObj.backupFrequency) document.getElementById('backupFrequency').value = settingsObj.backupFrequency;
+                if (settingsObj.inventoryCategories) {
+                    state.settingsCache.inventoryCategories = settingsObj.inventoryCategories;
+                    document.getElementById('inventoryCategories').value = settingsObj.inventoryCategories.join('\n');
+                }
+                if (settingsObj.expenseCategories) {
+                    state.settingsCache.expenseCategories = settingsObj.expenseCategories;
+                    document.getElementById('expenseCategories').value = settingsObj.expenseCategories.join('\n');
+                }
+                if (settingsObj.vendorNames) {
+                    state.settingsCache.vendorNames = settingsObj.vendorNames;
+                    document.getElementById('vendorNames').value = settingsObj.vendorNames.join('\n');
+                }
+                if (settingsObj.bankNames) {
+                    state.settingsCache.bankNames = settingsObj.bankNames;
+                    document.getElementById('bankNames').value = settingsObj.bankNames.join('\n');
+                }
+                applySettingsToUI();
+
+                if (!skipAutosaveReconnect) {
+                    if (settingsObj.autosaveFileHandle) {
+                        state.autosave.handle = settingsObj.autosaveFileHandle;
+                        state.autosave.fileName = settingsObj.autosaveFileName || settingsObj.autosaveFileHandle.name || 'business-data.json';
+                        updateAutosaveStatus(`Connecting to ${state.autosave.fileName}…`, 'info');
+                        await syncFromAutosaveFile(settingsObj.autosaveFileHandle);
+                    } else {
+                        state.autosave.handle = null;
+                        state.autosave.fileName = null;
+                        state.autosave.lastSaved = null;
+                        updateAutosaveStatus('Select a JSON file to enable instant autosave.', 'warning');
+                    }
+                } else if (state.autosave.handle) {
+                    const lastSavedText = describeLastSaved();
+                    const message = lastSavedText
+                        ? `Connected to ${state.autosave.fileName || 'data file'}. ${lastSavedText}`
+                        : `Connected to ${state.autosave.fileName || 'data file'}.`;
+                    updateAutosaveStatus(message, 'success');
+                } else {
+                    updateAutosaveStatus('Select a JSON file to enable instant autosave.', 'warning');
+                }
             } catch (error) {
                 console.log('Settings not found, using defaults');
+                document.getElementById('inventoryCategories').value = state.settingsCache.inventoryCategories.join('\n');
+                document.getElementById('expenseCategories').value = state.settingsCache.expenseCategories.join('\n');
+                document.getElementById('vendorNames').value = state.settingsCache.vendorNames.join('\n');
+                document.getElementById('bankNames').value = state.settingsCache.bankNames.join('\n');
+                applySettingsToUI();
+                if (!skipAutosaveReconnect) {
+                    updateAutosaveStatus('Select a JSON file to enable instant autosave.', 'warning');
+                }
             }
         }
 
@@ -2941,11 +4841,31 @@
             
             // Wait for database to initialize
             await db.init();
-            
+
             // Load initial data
             await loadSettings();
             await loadDashboard();
-            
+            setupFormAutosave();
+
+            const bind = (id, event, handler) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener(event, handler);
+                }
+            };
+
+            bind('inventorySearch', 'input', loadInventory);
+            bind('categoryFilter', 'change', loadInventory);
+            bind('salesSearch', 'input', loadSales);
+            bind('salesDateFilter', 'change', loadSales);
+            bind('salesStatusFilter', 'change', loadSales);
+            bind('purchaseSearch', 'input', loadPurchases);
+            bind('purchaseDateFilter', 'change', loadPurchases);
+            bind('purchaseStatusFilter', 'change', loadPurchases);
+            bind('expenseSearch', 'input', loadExpenses);
+            bind('expenseDateFilter', 'change', loadExpenses);
+            bind('expenseCategoryFilter', 'change', loadExpenses);
+
             // Set up navigation
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.addEventListener('click', (e) => {
