@@ -200,6 +200,42 @@
             margin-bottom: 1rem;
         }
 
+        .autosave-status {
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            border: 1px dashed var(--border);
+            background: var(--surface);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .autosave-status.success {
+            border-color: var(--success);
+            background: rgba(5, 150, 105, 0.08);
+            color: var(--success);
+        }
+
+        .autosave-status.info {
+            border-color: var(--primary);
+            background: rgba(37, 99, 235, 0.08);
+            color: var(--primary);
+        }
+
+        .autosave-status.warning {
+            border-color: var(--warning);
+            background: rgba(217, 119, 6, 0.08);
+            color: var(--warning);
+        }
+
+        .autosave-status.error {
+            border-color: var(--danger);
+            background: rgba(220, 38, 38, 0.08);
+            color: var(--danger);
+        }
+
         .form-label {
             display: block;
             margin-bottom: 0.25rem;
@@ -943,6 +979,24 @@
                             <h2 class="card-title">Data Management</h2>
                         </div>
 
+                        <div class="form-group">
+                            <label class="form-label">Real-time Autosave</label>
+                            <div class="autosave-status warning" id="autosaveStatus">
+                                Select a JSON file to enable instant saves across browsers and devices.
+                            </div>
+                        </div>
+
+                        <div style="display: flex; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1.5rem;">
+                            <button class="btn" onclick="connectAutosaveFile()">🔒 Connect Autosave File</button>
+                            <button class="btn secondary" onclick="reconnectAutosaveFile()">🔁 Reconnect</button>
+                            <button class="btn secondary" onclick="forceAutosaveNow()">💾 Save Now</button>
+                            <button class="btn danger" onclick="disconnectAutosaveFile()">❌ Disconnect</button>
+                        </div>
+
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.5rem;">
+                            Once connected, every change you make is written straight to your chosen JSON data file automatically.
+                        </p>
+
                         <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
                             <button class="btn" onclick="exportBackup()">📤 Export Backup</button>
                             <button class="btn secondary" onclick="importBackup()">📥 Import Backup</button>
@@ -1422,7 +1476,33 @@
         class BusinessDB {
             constructor() {
                 this.db = null;
+                this.preserveTimestamps = false;
+                this.changeListeners = new Set();
                 this.init();
+            }
+
+            onChange(callback) {
+                if (typeof callback === 'function') {
+                    this.changeListeners.add(callback);
+                }
+            }
+
+            offChange(callback) {
+                this.changeListeners.delete(callback);
+            }
+
+            notifyChange(detail = {}) {
+                this.changeListeners.forEach(listener => {
+                    try {
+                        listener(detail);
+                    } catch (error) {
+                        console.error('Change listener failed', error);
+                    }
+                });
+            }
+
+            setPreserveTimestamps(enabled) {
+                this.preserveTimestamps = Boolean(enabled);
             }
 
             async init() {
@@ -1542,9 +1622,17 @@
             }
 
             async clear(storeName) {
-                const transaction = this.db.transaction([storeName], 'readwrite');
-                const store = transaction.objectStore(storeName);
-                return store.clear();
+                return new Promise((resolve, reject) => {
+                    const transaction = this.db.transaction([storeName], 'readwrite');
+                    const store = transaction.objectStore(storeName);
+                    transaction.oncomplete = () => {
+                        this.notifyChange({ storeName, type: 'clear' });
+                        resolve();
+                    };
+                    transaction.onerror = () => reject(transaction.error);
+                    const request = store.clear();
+                    request.onerror = () => reject(request.error);
+                });
             }
         }
 
@@ -1570,6 +1658,8 @@
                 bankNames: []
             }
         };
+
+        db.onChange(() => scheduleRealtimeSave('db-change'));
 
         // Utility functions
         function formatCurrency(amount) {
@@ -1604,6 +1694,725 @@
                 reader.onerror = reject;
                 reader.readAsDataURL(file);
             });
+        }
+
+        async function saveAttachment(entity, entityId, file) {
+            if (!file) return null;
+            const dataUrl = await readFileAsDataURL(file);
+            const attachment = {
+                entity,
+                entityId,
+                name: file.name,
+                type: file.type,
+                size: file.size,
+                dataUrl
+            };
+            const id = await db.add('attachments', attachment);
+            return id;
+        }
+
+        async function getAttachments(entity, entityId) {
+            const attachments = await db.getAll('attachments');
+            return attachments.filter(att => att.entity === entity && att.entityId === entityId);
+        }
+
+        async function deleteAttachments(entity, entityId) {
+            const attachments = await getAttachments(entity, entityId);
+            for (const attachment of attachments) {
+                await db.delete('attachments', attachment.id);
+            }
+        }
+
+        function renderAttachments(attachments) {
+            if (!attachments || attachments.length === 0) {
+                return '<p style="color: var(--text-secondary);">No attachments uploaded.</p>';
+            }
+
+            return `
+                <div class="attachment-preview">
+                    ${attachments.map(att => `
+                        <a class="attachment-card" href="${att.dataUrl}" download="${att.name}" target="_blank" rel="noopener">
+                            📎 <span>${att.name}</span>
+                        </a>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function debounce(fn, delay = 300) {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => fn(...args), delay);
+            };
+        }
+
+        const formDraftHandlers = {
+            inventoryForm: {
+                serialize: () => ({
+                    itemSku: document.getElementById('itemSku').value,
+                    itemName: document.getElementById('itemName').value,
+                    itemCategory: document.getElementById('itemCategory').value,
+                    itemMinStock: document.getElementById('itemMinStock').value,
+                    itemCostPrice: document.getElementById('itemCostPrice').value,
+                    itemSellingPrice: document.getElementById('itemSellingPrice').value,
+                    itemStock: document.getElementById('itemStock').value
+                }),
+                populate: async (data = {}) => {
+                    document.getElementById('itemSku').value = data.itemSku || '';
+                    document.getElementById('itemName').value = data.itemName || '';
+                    document.getElementById('itemCategory').value = data.itemCategory || '';
+                    document.getElementById('itemMinStock').value = data.itemMinStock || '';
+                    document.getElementById('itemCostPrice').value = data.itemCostPrice || '';
+                    document.getElementById('itemSellingPrice').value = data.itemSellingPrice || '';
+                    document.getElementById('itemStock').value = data.itemStock || '';
+                }
+            },
+            salesForm: {
+                serialize: () => {
+                    const container = document.getElementById('saleItems');
+                    const items = Array.from(container.querySelectorAll('.sale-item-row')).map(row => ({
+                        itemId: row.querySelector('.sale-item-select')?.value || '',
+                        qty: row.querySelector('.sale-qty')?.value || '',
+                        price: row.querySelector('.sale-price')?.value || ''
+                    }));
+
+                    return {
+                        saleCustomer: document.getElementById('saleCustomer').value,
+                        saleDate: document.getElementById('saleDate').value,
+                        saleDiscount: document.getElementById('saleDiscount').value,
+                        saleShipping: document.getElementById('saleShipping').value,
+                        salePaymentMethod: document.getElementById('salePaymentMethod').value,
+                        items
+                    };
+                },
+                populate: async (data = {}) => {
+                    document.getElementById('saleCustomer').value = data.saleCustomer || '';
+                    document.getElementById('saleDate').value = data.saleDate || '';
+                    document.getElementById('saleDiscount').value = data.saleDiscount ?? 0;
+                    document.getElementById('saleShipping').value = data.saleShipping ?? 0;
+                    document.getElementById('salePaymentMethod').value = data.salePaymentMethod || '';
+
+                    const container = document.getElementById('saleItems');
+                    container.innerHTML = '';
+                    const items = data.items && data.items.length ? data.items : [{}];
+                    items.forEach(() => addSaleItem());
+                    await loadSaleItems();
+
+                    const rows = container.querySelectorAll('.sale-item-row');
+                    items.forEach((item, index) => {
+                        const row = rows[index];
+                        if (!row) return;
+                        row.querySelector('.sale-item-select').value = item.itemId || '';
+                        row.querySelector('.sale-qty').value = item.qty || '';
+                        row.querySelector('.sale-price').value = item.price || '';
+                    });
+                }
+            },
+            purchaseForm: {
+                serialize: () => {
+                    const container = document.getElementById('purchaseItems');
+                    const items = Array.from(container.querySelectorAll('.purchase-item-row')).map(row => ({
+                        itemId: row.querySelector('.purchase-item-select')?.value || '',
+                        qty: row.querySelector('.purchase-qty')?.value || '',
+                        cost: row.querySelector('.purchase-cost')?.value || ''
+                    }));
+
+                    return {
+                        purchaseSupplier: document.getElementById('purchaseSupplier').value,
+                        purchaseDate: document.getElementById('purchaseDate').value,
+                        purchasePaymentMethod: document.getElementById('purchasePaymentMethod')?.value || '',
+                        items
+                    };
+                },
+                populate: async (data = {}) => {
+                    document.getElementById('purchaseSupplier').value = data.purchaseSupplier || '';
+                    document.getElementById('purchaseDate').value = data.purchaseDate || '';
+                    const paymentMethod = document.getElementById('purchasePaymentMethod');
+                    if (paymentMethod) {
+                        paymentMethod.value = data.purchasePaymentMethod || '';
+                    }
+
+                    const container = document.getElementById('purchaseItems');
+                    container.innerHTML = '';
+                    const items = data.items && data.items.length ? data.items : [{}];
+                    items.forEach(() => addPurchaseItem());
+                    await loadPurchaseItems();
+
+                    const rows = container.querySelectorAll('.purchase-item-row');
+                    items.forEach((item, index) => {
+                        const row = rows[index];
+                        if (!row) return;
+                        row.querySelector('.purchase-item-select').value = item.itemId || '';
+                        row.querySelector('.purchase-qty').value = item.qty || '';
+                        row.querySelector('.purchase-cost').value = item.cost || '';
+                    });
+                }
+            },
+            expenseForm: {
+                serialize: () => ({
+                    expenseDate: document.getElementById('expenseDate').value,
+                    expenseCategory: document.getElementById('expenseCategory').value,
+                    expenseDescription: document.getElementById('expenseDescription').value,
+                    expenseAmount: document.getElementById('expenseAmount').value,
+                    expensePaymentMethod: document.getElementById('expensePaymentMethod').value,
+                    expenseParty: document.getElementById('expenseParty').value
+                }),
+                populate: async (data = {}) => {
+                    document.getElementById('expenseDate').value = data.expenseDate || '';
+                    document.getElementById('expenseCategory').value = data.expenseCategory || '';
+                    document.getElementById('expenseDescription').value = data.expenseDescription || '';
+                    document.getElementById('expenseAmount').value = data.expenseAmount || '';
+                    document.getElementById('expensePaymentMethod').value = data.expensePaymentMethod || '';
+                    document.getElementById('expenseParty').value = data.expenseParty || '';
+                }
+            },
+            loanForm: {
+                serialize: () => ({
+                    loanDate: document.getElementById('loanDate').value,
+                    loanType: document.getElementById('loanType').value,
+                    loanAmount: document.getElementById('loanAmount').value,
+                    loanDescription: document.getElementById('loanDescription').value
+                }),
+                populate: async (data = {}) => {
+                    document.getElementById('loanDate').value = data.loanDate || '';
+                    document.getElementById('loanType').value = data.loanType || '';
+                    document.getElementById('loanAmount').value = data.loanAmount || '';
+                    document.getElementById('loanDescription').value = data.loanDescription || '';
+                }
+            },
+            paymentForm: {
+                serialize: () => ({
+                    paymentType: state.paymentType,
+                    paymentInvoice: document.getElementById('paymentInvoice').value,
+                    paymentDate: document.getElementById('paymentDate').value,
+                    paymentAmount: document.getElementById('paymentAmount').value,
+                    paymentMethod: document.getElementById('paymentMethod').value,
+                    paymentNotes: document.getElementById('paymentNotes').value
+                }),
+                populate: async (data = {}, context = {}) => {
+                    const expectedType = context.expectedType || state.paymentType || 'payable';
+                    if (data.paymentType && data.paymentType !== expectedType) {
+                        return false;
+                    }
+                    const effectiveType = data.paymentType || expectedType;
+                    state.paymentType = effectiveType;
+                    await loadPaymentInvoices(effectiveType);
+                    document.getElementById('paymentInvoice').value = data.paymentInvoice || '';
+                    document.getElementById('paymentDate').value = data.paymentDate || '';
+                    document.getElementById('paymentAmount').value = data.paymentAmount || '';
+                    document.getElementById('paymentMethod').value = data.paymentMethod || '';
+                    document.getElementById('paymentNotes').value = data.paymentNotes || '';
+                    return true;
+                }
+            },
+            transferForm: {
+                serialize: () => ({
+                    transferType: document.getElementById('transferType').value,
+                    transferFrom: document.getElementById('transferFrom').value,
+                    transferTo: document.getElementById('transferTo').value,
+                    transferDate: document.getElementById('transferDate').value,
+                    transferAmount: document.getElementById('transferAmount').value,
+                    transferDescription: document.getElementById('transferDescription').value
+                }),
+                populate: async (data = {}) => {
+                    applySettingsToUI();
+                    document.getElementById('transferType').value = data.transferType || '';
+                    document.getElementById('transferFrom').value = data.transferFrom || '';
+                    document.getElementById('transferTo').value = data.transferTo || '';
+                    document.getElementById('transferDate').value = data.transferDate || '';
+                    document.getElementById('transferAmount').value = data.transferAmount || '';
+                    document.getElementById('transferDescription').value = data.transferDescription || '';
+                }
+            }
+        };
+
+        async function saveFormDraft(formId, draft) {
+            try {
+                const existing = await db.get('formDrafts', formId);
+                if (existing) {
+                    await db.update('formDrafts', { ...existing, data: draft });
+                } else {
+                    await db.add('formDrafts', { id: formId, data: draft });
+                }
+            } catch (error) {
+                console.error(`Failed to save draft for ${formId}`, error);
+            }
+        }
+
+        async function loadFormDraft(formId) {
+            try {
+                const record = await db.get('formDrafts', formId);
+                return record?.data || null;
+            } catch (error) {
+                console.error(`Failed to load draft for ${formId}`, error);
+                return null;
+            }
+        }
+
+        async function clearFormDraft(formId) {
+            try {
+                await db.delete('formDrafts', formId);
+            } catch (error) {
+                console.error(`Failed to clear draft for ${formId}`, error);
+            }
+        }
+
+        async function restoreFormDraft(formId, context = {}) {
+            const handler = formDraftHandlers[formId];
+            if (!handler) return false;
+
+            const previousSuppression = state.suppressAutosave;
+            try {
+                const draft = await loadFormDraft(formId);
+                if (!draft) {
+                    return false;
+                }
+                state.suppressAutosave = true;
+                const applied = await handler.populate(draft, context);
+                return applied !== false;
+            } catch (error) {
+                console.error(`Failed to restore draft for ${formId}`, error);
+                return false;
+            } finally {
+                state.suppressAutosave = previousSuppression;
+            }
+        }
+
+        function setupFormAutosave() {
+            Object.entries(formDraftHandlers).forEach(([formId, handler]) => {
+                const form = document.getElementById(formId);
+                if (!form || typeof handler.serialize !== 'function') return;
+
+                const saveDraft = debounce(async () => {
+                    try {
+                        const draft = await Promise.resolve(handler.serialize());
+                        await saveFormDraft(formId, draft);
+                    } catch (error) {
+                        console.error(`Autosave failed for ${formId}`, error);
+                    }
+                }, 400);
+
+                form.addEventListener('input', saveDraft);
+                form.addEventListener('change', saveDraft);
+            });
+        }
+
+        function triggerDraftSave(formId) {
+            if (state.suppressAutosave) return;
+            const handler = formDraftHandlers[formId];
+            if (!handler || typeof handler.serialize !== 'function') return;
+            Promise.resolve(handler.serialize())
+                .then(draft => saveFormDraft(formId, draft))
+                .catch(error => console.error(`Manual autosave failed for ${formId}`, error));
+        }
+
+        function parseListInput(value, fallback = []) {
+            const lines = (value || '').split('\n').map(line => line.trim()).filter(Boolean);
+            return lines.length ? Array.from(new Set(lines)) : fallback;
+        }
+
+        function applySettingsToUI() {
+            const { inventoryCategories, expenseCategories, vendorNames, bankNames } = state.settingsCache;
+
+            const categorySelect = document.getElementById('itemCategory');
+            const categoryFilter = document.getElementById('categoryFilter');
+            const currentCategorySelection = categorySelect ? categorySelect.value : '';
+
+            if (categorySelect) {
+                categorySelect.innerHTML = '<option value="">Select Category</option>' +
+                    inventoryCategories.map(category => `<option value="${category}">${category}</option>`).join('');
+                if (currentCategorySelection && !inventoryCategories.includes(currentCategorySelection)) {
+                    categorySelect.insertAdjacentHTML('beforeend', `<option value="${currentCategorySelection}">${currentCategorySelection}</option>`);
+                }
+                if (currentCategorySelection) {
+                    categorySelect.value = currentCategorySelection;
+                }
+            }
+
+            if (categoryFilter) {
+                const selectedValue = categoryFilter.value;
+                categoryFilter.innerHTML = '<option value="">All Categories</option>' +
+                    inventoryCategories.map(category => `<option value="${category}">${category}</option>`).join('');
+                if (inventoryCategories.includes(selectedValue)) {
+                    categoryFilter.value = selectedValue;
+                }
+            }
+
+            const expenseCategorySelect = document.getElementById('expenseCategory');
+            const expenseFilterSelect = document.getElementById('expenseCategoryFilter');
+            const currentExpenseCategory = expenseCategorySelect ? expenseCategorySelect.value : '';
+
+            if (expenseCategorySelect) {
+                expenseCategorySelect.innerHTML = '<option value="">Select Category</option>' +
+                    expenseCategories.map(category => `<option value="${category}">${category}</option>`).join('');
+                if (currentExpenseCategory && !expenseCategories.includes(currentExpenseCategory)) {
+                    expenseCategorySelect.insertAdjacentHTML('beforeend', `<option value="${currentExpenseCategory}">${currentExpenseCategory}</option>`);
+                }
+                if (currentExpenseCategory) {
+                    expenseCategorySelect.value = currentExpenseCategory;
+                }
+            }
+
+            if (expenseFilterSelect) {
+                const selectedValue = expenseFilterSelect.value;
+                expenseFilterSelect.innerHTML = '<option value="">All Categories</option>' +
+                    expenseCategories.map(category => `<option value="${category}">${category}</option>`).join('');
+                if (expenseCategories.includes(selectedValue)) {
+                    expenseFilterSelect.value = selectedValue;
+                }
+            }
+
+            const vendorList = document.getElementById('vendorList');
+            if (vendorList) {
+                vendorList.innerHTML = vendorNames.map(vendor => `<option value="${vendor}"></option>`).join('');
+            }
+
+            const transferFrom = document.getElementById('transferFrom');
+            const transferTo = document.getElementById('transferTo');
+            const bankOptions = bankNames.map(bank => `Bank: ${bank}`);
+            const accountOptions = ['Cash', ...bankOptions];
+
+            if (transferFrom) {
+                const selected = transferFrom.value;
+                transferFrom.innerHTML = '<option value="">Select Source</option>' +
+                    accountOptions.map(option => `<option value="${option}">${option}</option>`).join('');
+                if (accountOptions.includes(selected)) transferFrom.value = selected;
+            }
+
+            if (transferTo) {
+                const selected = transferTo.value;
+                transferTo.innerHTML = '<option value="">Select Destination</option>' +
+                    accountOptions.map(option => `<option value="${option}">${option}</option>`).join('');
+                if (accountOptions.includes(selected)) transferTo.value = selected;
+            }
+        }
+
+        function renderStatusChip(status, isOverdue = false) {
+            const normalized = (status || '').toLowerCase();
+            let cls = 'pending';
+            let label = status || 'Pending';
+
+            if (normalized === 'paid') {
+                cls = 'paid';
+            } else if (normalized === 'pending' && isOverdue) {
+                cls = 'overdue';
+                label = 'Overdue';
+            }
+
+            return `<span class="status-chip ${cls}">${label}</span>`;
+        }
+
+        function showDetails(title, content) {
+            document.getElementById('detailModalTitle').textContent = title;
+            document.getElementById('detailContent').innerHTML = content;
+            showModal('detailModal');
+        }
+
+        function formatTransferType(type) {
+            switch (type) {
+                case 'cash-to-bank':
+                    return 'Cash ➜ Bank';
+                case 'bank-to-cash':
+                    return 'Bank ➜ Cash';
+                case 'bank-to-bank':
+                    return 'Bank ➜ Bank';
+                case 'cash-internal':
+                    return 'Cash Transfer';
+                default:
+                    return 'Transfer';
+            }
+        }
+
+        // Navigation
+        function navigateTo(page) {
+            // Update active nav item
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-page="${page}"]`).classList.add('active');
+
+            // Show active page
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+        }
+
+        function getAutosaveStatusElement() {
+            return document.getElementById('autosaveStatus');
+        }
+
+        function updateAutosaveStatus(message, tone = 'warning') {
+            const el = getAutosaveStatusElement();
+            if (!el) return;
+            el.className = `autosave-status ${tone}`;
+            el.textContent = message;
+        }
+
+        function closeModal(modalId) {
+            const previousSuppression = state.suppressAutosave;
+            state.suppressAutosave = true;
+            try {
+                document.getElementById(modalId).classList.remove('active');
+                // Reset forms
+                const form = document.querySelector(`#${modalId} form`);
+                if (form) form.reset();
+                state.editingItem = null;
+                if (modalId === 'salesModal') {
+                    state.editingSale = null;
+                    const container = document.getElementById('saleItems');
+                    if (container) {
+                        container.innerHTML = '';
+                        addSaleItem();
+                    }
+                }
+                if (modalId === 'purchaseModal') {
+                    state.editingPurchase = null;
+                    const container = document.getElementById('purchaseItems');
+                    if (container) {
+                        container.innerHTML = '';
+                        addPurchaseItem();
+                    }
+                }
+                if (modalId === 'expenseModal') {
+                    state.editingExpense = null;
+                }
+            } finally {
+                state.suppressAutosave = previousSuppression;
+            }
+        }
+
+        async function ensureAutosavePermission(handle, { request = false } = {}) {
+            if (!handle || !handle.queryPermission) return 'denied';
+            try {
+                const options = { mode: 'readwrite' };
+                let permission = await handle.queryPermission(options);
+                if (permission === 'granted' || permission === 'denied' || !request) {
+                    return permission;
+                }
+                return await handle.requestPermission(options);
+            } catch (error) {
+                console.error('Permission request failed', error);
+                return 'denied';
+            }
+        }
+
+        function scheduleRealtimeSave(reason = 'change') {
+            if (!state.autosave || !state.autosave.handle) {
+                updateAutosaveStatus('Select a JSON file to enable instant autosave.', 'warning');
+                return;
+            }
+            if (state.importingFromFile) return;
+
+            state.autosave.nextSaveReason = reason;
+            state.autosave.needsAnotherSave = false;
+
+            if (state.autosave.timer) {
+                clearTimeout(state.autosave.timer);
+            }
+
+            // Process transfers
+            transfers.forEach(transfer => {
+                const fromCash = transfer.from === 'Cash';
+                const toCash = transfer.to === 'Cash';
+                const fromBank = transfer.from && transfer.from.startsWith('Bank');
+                const toBank = transfer.to && transfer.to.startsWith('Bank');
+
+                if (fromCash && toBank) {
+                    cash -= transfer.amount;
+                    bank += transfer.amount;
+                } else if (fromBank && toCash) {
+                    bank -= transfer.amount;
+                    cash += transfer.amount;
+                }
+            });
+
+            state.autosave.timer = setTimeout(() => {
+                state.autosave.timer = null;
+                persistRealtimeSnapshot(state.autosave.nextSaveReason || 'change');
+            }, 750);
+        }
+
+        async function buildBackupObject({ includeAutosaveHandle = false } = {}) {
+            const stores = ['inventory', 'sales', 'purchases', 'expenses', 'loans', 'payments', 'transfers', 'attachments', 'settings', 'formDrafts'];
+            const data = {};
+            const timestamp = new Date().toISOString();
+
+            for (const store of stores) {
+                const records = await db.getAll(store);
+                if (store === 'settings' && !includeAutosaveHandle) {
+                    data[store] = records.filter(entry => entry.key !== 'autosaveFileHandle');
+                } else {
+                    data[store] = records;
+                }
+            }
+
+            return {
+                version: '1.1',
+                exportedAt: timestamp,
+                timestamp,
+                data
+            };
+        }
+
+        async function persistRealtimeSnapshot(reason = 'change') {
+            if (!state.autosave.handle) return;
+
+            if (state.autosave.isSaving) {
+                state.autosave.needsAnotherSave = true;
+                state.autosave.nextSaveReason = reason;
+                return;
+            }
+
+            state.autosave.isSaving = true;
+            updateAutosaveStatus(`Saving changes to ${state.autosave.fileName || 'data file'}…`, 'info');
+
+            try {
+                const snapshot = await buildBackupObject();
+                const writable = await state.autosave.handle.createWritable();
+                await writable.write(JSON.stringify(snapshot, null, 2));
+                await writable.close();
+                state.autosave.lastSaved = new Date();
+                const lastSavedText = describeLastSaved();
+                const successMessage = lastSavedText
+                    ? `Connected to ${state.autosave.fileName || 'data file'}. ${lastSavedText}`
+                    : `Connected to ${state.autosave.fileName || 'data file'}.`;
+                updateAutosaveStatus(successMessage, 'success');
+            } catch (error) {
+                console.error('Failed to persist autosave snapshot', error);
+                updateAutosaveStatus(`Autosave failed: ${error.message}`, 'error');
+            } finally {
+                state.autosave.isSaving = false;
+                state.autosave.nextSaveReason = null;
+                if (state.autosave.needsAnotherSave) {
+                    state.autosave.needsAnotherSave = false;
+                    scheduleRealtimeSave('queued');
+                }
+            }
+        }
+
+        async function syncFromAutosaveFile(handle) {
+            if (!handle || !handle.getFile) return;
+            const permission = await ensureAutosavePermission(handle, { request: false });
+            if (permission !== 'granted') {
+                updateAutosaveStatus('Click “Reconnect” to allow the app to access your autosave file.', 'warning');
+                return;
+            }
+
+            try {
+                const file = await handle.getFile();
+                if (file.size === 0) {
+                    updateAutosaveStatus(`Connected to ${state.autosave.fileName || file.name}. Waiting for first save…`, 'info');
+                    return;
+                }
+                const text = await file.text();
+                const backup = JSON.parse(text);
+                await restoreBackupData(backup, { preserveAutosaveHandle: true, skipAutosave: true });
+                await loadSettings({ skipAutosaveReconnect: true });
+                if (backup.exportedAt) {
+                    const lastSaved = new Date(backup.exportedAt);
+                    if (!isNaN(lastSaved.getTime())) {
+                        state.autosave.lastSaved = lastSaved;
+                    }
+                }
+                const lastSavedText = describeLastSaved();
+                const message = lastSavedText
+                    ? `Connected to ${state.autosave.fileName || file.name}. ${lastSavedText}`
+                    : `Connected to ${state.autosave.fileName || file.name}.`;
+                updateAutosaveStatus(message, 'success');
+                await loadPageData(state.currentPage);
+                await updateSummaryChips();
+            } catch (error) {
+                console.error('Failed to sync from autosave file', error);
+                updateAutosaveStatus(`Could not read autosave file: ${error.message}`, 'error');
+            }
+        }
+
+        async function connectAutosaveFile() {
+            if (!window.showSaveFilePicker) {
+                showToast('Your browser does not support connecting to local files for autosave.', 'error');
+                return;
+            }
+
+            try {
+                const handle = await window.showSaveFilePicker({
+                    suggestedName: 'business-data.json',
+                    types: [{
+                        description: 'Business Manager Data',
+                        accept: { 'application/json': ['.json'] }
+                    }]
+                });
+
+                state.autosave.handle = handle;
+                state.autosave.fileName = handle.name || 'business-data.json';
+                await db.update('settings', { key: 'autosaveFileHandle', value: handle });
+                await db.update('settings', { key: 'autosaveFileName', value: state.autosave.fileName });
+
+                const permission = await ensureAutosavePermission(handle, { request: true });
+                if (permission !== 'granted') {
+                    updateAutosaveStatus('Permission denied. Click “Reconnect” to try again.', 'error');
+                    return;
+                }
+
+                updateAutosaveStatus(`Connected to ${state.autosave.fileName}. Saving…`, 'info');
+                await persistRealtimeSnapshot('initial-connect');
+                showToast('Autosave connected successfully');
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    return;
+                }
+                console.error('Failed to connect autosave file', error);
+                showToast('Could not connect autosave file: ' + error.message, 'error');
+            }
+        }
+
+        async function reconnectAutosaveFile() {
+            if (!state.autosave.handle) {
+                showToast('No autosave file connected yet.', 'error');
+                return;
+            }
+
+            const permission = await ensureAutosavePermission(state.autosave.handle, { request: true });
+            if (permission !== 'granted') {
+                updateAutosaveStatus('Permission denied. Please pick the autosave file again.', 'error');
+                return;
+            }
+
+            updateAutosaveStatus(`Connected to ${state.autosave.fileName}. Refreshing…`, 'info');
+            await syncFromAutosaveFile(state.autosave.handle);
+            await persistRealtimeSnapshot('reconnect');
+            showToast('Autosave file reconnected');
+        }
+
+        async function disconnectAutosaveFile() {
+            state.autosave.handle = null;
+            state.autosave.fileName = null;
+            state.autosave.lastSaved = null;
+            if (state.autosave.timer) {
+                clearTimeout(state.autosave.timer);
+                state.autosave.timer = null;
+            }
+            state.autosave.needsAnotherSave = false;
+            state.autosave.nextSaveReason = null;
+            state.autosave.isSaving = false;
+
+            try {
+                await db.delete('settings', 'autosaveFileHandle');
+            } catch (_) { /* ignore */ }
+            try {
+                await db.delete('settings', 'autosaveFileName');
+            } catch (_) { /* ignore */ }
+
+            updateAutosaveStatus('Autosave disconnected. Select a JSON file to resume instant backups.', 'warning');
+            showToast('Autosave file disconnected');
+        }
+
+        function forceAutosaveNow() {
+            if (!state.autosave.handle) {
+                showToast('Connect an autosave file first.', 'error');
+                return;
+            }
+            persistRealtimeSnapshot('manual');
         }
 
         async function saveAttachment(entity, entityId, file) {
@@ -3711,7 +4520,19 @@
         }
 
         // Backup and export functions
-        async function exportBackup() {
+        async function restoreBackupData(backup, { preserveAutosaveHandle = true, skipAutosave = false } = {}) {
+            if (!backup || !backup.data) {
+                throw new Error('Invalid backup file format');
+            }
+
+            const stores = ['inventory', 'sales', 'purchases', 'expenses', 'loans', 'payments', 'transfers', 'attachments', 'formDrafts'];
+            const settingsData = Array.isArray(backup.data.settings) ? backup.data.settings : [];
+            const preservedHandle = preserveAutosaveHandle ? state.autosave.handle : null;
+            const preservedName = preserveAutosaveHandle ? state.autosave.fileName : null;
+
+            state.importingFromFile = true;
+            db.setPreserveTimestamps(true);
+
             try {
                 const backup = {
                     version: '1.0',
@@ -3722,9 +4543,43 @@
                 const stores = ['inventory', 'sales', 'purchases', 'expenses', 'loans', 'payments', 'transfers', 'attachments', 'settings', 'formDrafts'];
                 
                 for (const store of stores) {
-                    backup.data[store] = await db.getAll(store);
+                    await db.clear(store);
                 }
-                
+
+                await db.clear('settings');
+
+                for (const entry of settingsData) {
+                    if (entry.key === 'autosaveFileHandle') continue;
+                    await db.update('settings', entry);
+                }
+
+                if (preservedHandle) {
+                    await db.update('settings', { key: 'autosaveFileHandle', value: preservedHandle });
+                }
+                if (preservedName) {
+                    await db.update('settings', { key: 'autosaveFileName', value: preservedName });
+                }
+
+                for (const store of stores) {
+                    const records = Array.isArray(backup.data[store]) ? backup.data[store] : [];
+                    for (const record of records) {
+                        await db.add(store, record);
+                    }
+                }
+            } finally {
+                db.setPreserveTimestamps(false);
+                state.importingFromFile = false;
+            }
+
+            if (!skipAutosave) {
+                scheduleRealtimeSave('restore');
+            }
+        }
+
+        async function exportBackup() {
+            try {
+                const backup = await buildBackupObject();
+
                 const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -3734,7 +4589,7 @@
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                
+
                 showToast('Backup exported successfully');
             } catch (error) {
                 showToast('Error exporting backup: ' + error.message, 'error');
@@ -3779,6 +4634,7 @@
                 
                 showToast('Backup imported successfully');
                 closeModal('backupModal');
+                await loadSettings({ skipAutosaveReconnect: true });
                 await loadPageData(state.currentPage);
                 await updateSummaryChips();
             } catch (error) {
@@ -4373,7 +5229,8 @@
             }
         }
 
-        async function loadSettings() {
+        async function loadSettings(options = {}) {
+            const { skipAutosaveReconnect = false } = options;
             try {
                 const settings = await db.getAll('settings');
                 const settingsObj = {};
