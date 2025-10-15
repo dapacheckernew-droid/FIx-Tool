@@ -1,0 +1,3034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Manager Pro</title>
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQnVzaW5lc3MgTWFuYWdlciBQcm8iLCJzaG9ydF9uYW1lIjoiQml6TWFuYWdlciIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjZmZmZmZmIiwidGhlbWVfY29sb3IiOiIjMjU2M2ViIiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjRiV3h1Y3owaWFIUjBjRG92TDNkM2R5NTNNeTV2Y21jdk1qQXdNQzl6ZG1jaUlIWnBaWGRDYjNnOUlqQWdNQ0F4TURZZ01UQTJJaUJtYVd4c1BTSWpNalUyTTJWaUlqNDhjbVZqZENCM2FXUjBhRDBpTVRBMklpQm9aV2xuYUhROUlqRXdOaUlpSUhKNFBTSXhNaUlpTHo0OEwzTjJaejQ9IiwidHlwZSI6ImltYWdlL3N2Zyt4bWwiLCJzaXplcyI6IjEwNngxMDYifV19">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --border-radius: 8px;
+        }
+
+        [data-theme="dark"] {
+            --background: #0f172a;
+            --surface: #1e293b;
+            --border: #334155;
+            --text: #f1f5f9;
+            --text-secondary: #cbd5e1;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 2rem;
+            padding: 0.5rem;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            margin-bottom: 0.25rem;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .summary-chips {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .chip {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+        }
+
+        .chip.success {
+            background: #dcfce7;
+            border-color: var(--success);
+            color: var(--success);
+        }
+
+        .chip.warning {
+            background: #fef3c7;
+            border-color: var(--warning);
+            color: var(--warning);
+        }
+
+        .chip.danger {
+            background: #fee2e2;
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+
+        .content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn.secondary {
+            background: var(--secondary);
+        }
+
+        .btn.success {
+            background: var(--success);
+        }
+
+        .btn.danger {
+            background: var(--danger);
+        }
+
+        .btn.sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            background: var(--surface);
+            color: var(--text);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table th {
+            background: var(--background);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .table tr:hover {
+            background: var(--background);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            z-index: 1001;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .toast.error {
+            background: var(--danger);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .search-filter {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+        }
+
+        .filter-select {
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            background: var(--surface);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .pagination button {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            border-radius: var(--border-radius);
+        }
+
+        .pagination button.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .file-upload {
+            border: 2px dashed var(--border);
+            border-radius: var(--border-radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary);
+        }
+
+        .file-upload.dragover {
+            border-color: var(--primary);
+            background: rgb(37 99 235 / 0.05);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-filter {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <nav class="sidebar">
+            <div class="logo">Business Manager Pro</div>
+            <a href="#" class="nav-item active" data-page="dashboard">📊 Dashboard</a>
+            <a href="#" class="nav-item" data-page="inventory">📦 Inventory</a>
+            <a href="#" class="nav-item" data-page="sales">💰 Sales</a>
+            <a href="#" class="nav-item" data-page="purchases">🛒 Purchases</a>
+            <a href="#" class="nav-item" data-page="expenses">💸 Expenses</a>
+            <a href="#" class="nav-item" data-page="loans">🏦 Loans</a>
+            <a href="#" class="nav-item" data-page="payables">📋 Payables</a>
+            <a href="#" class="nav-item" data-page="receivables">📄 Receivables</a>
+            <a href="#" class="nav-item" data-page="banking">💳 Banking</a>
+            <a href="#" class="nav-item" data-page="reports">📈 Reports</a>
+            <a href="#" class="nav-item" data-page="settings">⚙️ Settings</a>
+        </nav>
+
+        <main class="main-content">
+            <header class="header">
+                <div class="summary-chips">
+                    <div class="chip success" id="cashChip">Cash: PKR 0</div>
+                    <div class="chip" id="bankChip">Bank: PKR 0</div>
+                    <div class="chip warning" id="payablesChip">Payables: PKR 0</div>
+                    <div class="chip danger" id="receivablesChip">Receivables: PKR 0</div>
+                </div>
+                <div>
+                    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+                    <button class="btn" onclick="showBackupModal()">💾 Backup</button>
+                </div>
+            </header>
+
+            <div class="content">
+                <!-- Dashboard Page -->
+                <div class="page active" id="dashboard">
+                    <div class="dashboard-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalSales">PKR 0</div>
+                            <div class="stat-label">Total Sales (This Month)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalPurchases">PKR 0</div>
+                            <div class="stat-label">Total Purchases (This Month)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="profit">PKR 0</div>
+                            <div class="stat-label">Profit (This Month)</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="lowStockItems">0</div>
+                            <div class="stat-label">Low Stock Items</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Recent Transactions</h2>
+                            <button class="btn" onclick="loadDemoData()">Load Demo Data</button>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentTransactions">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: var(--text-secondary);">
+                                        No transactions yet. Click "Load Demo Data" to get started.
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Inventory Page -->
+                <div class="page" id="inventory">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Inventory Management</h2>
+                            <button class="btn" onclick="showInventoryModal()">+ Add Item</button>
+                        </div>
+                        
+                        <div class="search-filter">
+                            <input type="text" class="search-input" placeholder="Search items..." id="inventorySearch">
+                            <select class="filter-select" id="categoryFilter">
+                                <option value="">All Categories</option>
+                                <option value="Shirts">Shirts</option>
+                                <option value="Pants">Pants</option>
+                                <option value="Accessories">Accessories</option>
+                            </select>
+                            <button class="btn secondary" onclick="exportInventoryCSV()">Export CSV</button>
+                        </div>
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Stock</th>
+                                    <th>Cost Price</th>
+                                    <th>Selling Price</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="inventoryTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Sales Page -->
+                <div class="page" id="sales">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Sales Management</h2>
+                            <button class="btn" onclick="showSalesModal()">+ New Sale</button>
+                        </div>
+
+                        <div class="search-filter">
+                            <input type="text" class="search-input" placeholder="Search sales..." id="salesSearch">
+                            <input type="date" class="form-input" id="salesDateFilter">
+                            <select class="filter-select" id="salesStatusFilter">
+                                <option value="">All Status</option>
+                                <option value="Paid">Paid</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Overdue">Overdue</option>
+                            </select>
+                        </div>
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="salesTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Purchases Page -->
+                <div class="page" id="purchases">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Purchase Management</h2>
+                            <button class="btn" onclick="showPurchaseModal()">+ New Purchase</button>
+                        </div>
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Supplier</th>
+                                    <th>Items</th>
+                                    <th>Total Cost</th>
+                                    <th>Payment Method</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="purchasesTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Expenses Page -->
+                <div class="page" id="expenses">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Expense Management</h2>
+                            <button class="btn" onclick="showExpenseModal()">+ Add Expense</button>
+                        </div>
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Category</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Payment Method</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expensesTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Loans Page -->
+                <div class="page" id="loans">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Loan Management</h2>
+                            <button class="btn" onclick="showLoanModal()">+ New Loan Transaction</button>
+                        </div>
+
+                        <div class="stat-card" style="margin-bottom: 1rem;">
+                            <div class="stat-value" id="totalLoanBalance">PKR 0</div>
+                            <div class="stat-label">Total Outstanding Loan Balance</div>
+                        </div>
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Amount</th>
+                                    <th>Description</th>
+                                    <th>Balance After</th>
+                                </tr>
+                            </thead>
+                            <tbody id="loansTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Payables Page -->
+                <div class="page" id="payables">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Accounts Payable</h2>
+                            <button class="btn" onclick="showPaymentModal('payable')">+ Record Payment</button>
+                        </div>
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Party</th>
+                                    <th>Invoice #</th>
+                                    <th>Date</th>
+                                    <th>Due Date</th>
+                                    <th>Amount</th>
+                                    <th>Paid</th>
+                                    <th>Outstanding</th>
+                                    <th>Days Overdue</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="payablesTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Receivables Page -->
+                <div class="page" id="receivables">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Accounts Receivable</h2>
+                            <button class="btn" onclick="showPaymentModal('receivable')">+ Record Receipt</button>
+                        </div>
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Invoice #</th>
+                                    <th>Date</th>
+                                    <th>Due Date</th>
+                                    <th>Amount</th>
+                                    <th>Received</th>
+                                    <th>Outstanding</th>
+                                    <th>Days Overdue</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="receivablesTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Banking Page -->
+                <div class="page" id="banking">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Cash & Banking</h2>
+                            <button class="btn" onclick="showTransferModal()">+ Bank Transfer</button>
+                        </div>
+
+                        <div class="dashboard-grid">
+                            <div class="stat-card">
+                                <div class="stat-value" id="cashBalance">PKR 0</div>
+                                <div class="stat-label">Cash on Hand</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="bankBalance">PKR 0</div>
+                                <div class="stat-label">Bank Balance</div>
+                            </div>
+                        </div>
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bankingTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Reports Page -->
+                <div class="page" id="reports">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Financial Reports</h2>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">From Date</label>
+                                <input type="date" class="form-input" id="reportFromDate">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">To Date</label>
+                                <input type="date" class="form-input" id="reportToDate">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Report Type</label>
+                                <select class="form-input" id="reportType">
+                                    <option value="profit-loss">Profit & Loss</option>
+                                    <option value="cash-flow">Cash Flow</option>
+                                    <option value="sales-report">Sales Report</option>
+                                    <option value="purchase-report">Purchase Report</option>
+                                    <option value="expense-report">Expense Report</option>
+                                    <option value="inventory-valuation">Inventory Valuation</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">&nbsp;</label>
+                                <button class="btn" onclick="generateReport()">Generate Report</button>
+                            </div>
+                        </div>
+
+                        <div id="reportOutput"></div>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div class="page" id="settings">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Application Settings</h2>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Business Name</label>
+                            <input type="text" class="form-input" id="businessName" value="My Business">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Default Currency</label>
+                            <select class="form-input" id="defaultCurrency">
+                                <option value="PKR">PKR - Pakistani Rupee</option>
+                                <option value="USD">USD - US Dollar</option>
+                                <option value="EUR">EUR - Euro</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Inventory Valuation Method</label>
+                            <select class="form-input" id="valuationMethod">
+                                <option value="FIFO">FIFO (First In, First Out)</option>
+                                <option value="Average">Average Cost</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Auto Backup Frequency</label>
+                            <select class="form-input" id="backupFrequency">
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                                <option value="disabled">Disabled</option>
+                            </select>
+                        </div>
+
+                        <button class="btn" onclick="saveSettings()">Save Settings</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Data Management</h2>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <button class="btn" onclick="exportBackup()">📤 Export Backup</button>
+                            <button class="btn secondary" onclick="importBackup()">📥 Import Backup</button>
+                            <button class="btn danger" onclick="clearAllData()">🗑️ Clear All Data</button>
+                        </div>
+
+                        <input type="file" id="importFile" accept=".json" style="display: none;">
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Inventory Modal -->
+    <div class="modal" id="inventoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add/Edit Inventory Item</h3>
+                <button class="close-btn" onclick="closeModal('inventoryModal')">&times;</button>
+            </div>
+            <form id="inventoryForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">SKU</label>
+                        <input type="text" class="form-input" id="itemSku" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-input" id="itemName" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select class="form-input" id="itemCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="Shirts">Shirts</option>
+                            <option value="Pants">Pants</option>
+                            <option value="Accessories">Accessories</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Min Stock Alert</label>
+                        <input type="number" class="form-input" id="itemMinStock" min="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Cost Price</label>
+                        <input type="number" class="form-input" id="itemCostPrice" min="0" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Selling Price</label>
+                        <input type="number" class="form-input" id="itemSellingPrice" min="0" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Initial Stock</label>
+                    <input type="number" class="form-input" id="itemStock" min="0">
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                    <button type="button" class="btn secondary" onclick="closeModal('inventoryModal')">Cancel</button>
+                    <button type="submit" class="btn">Save Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Sales Modal -->
+    <div class="modal" id="salesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">New Sale</h3>
+                <button class="close-btn" onclick="closeModal('salesModal')">&times;</button>
+            </div>
+            <form id="salesForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Customer Name</label>
+                        <input type="text" class="form-input" id="saleCustomer" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Sale Date</label>
+                        <input type="date" class="form-input" id="saleDate" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Items</label>
+                    <div id="saleItems">
+                        <div class="sale-item-row form-row">
+                            <div class="form-group">
+                                <select class="form-input sale-item-select" required>
+                                    <option value="">Select Item</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="number" class="form-input sale-qty" placeholder="Qty" min="1" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="number" class="form-input sale-price" placeholder="Price" min="0" step="0.01" required>
+                            </div>
+                            <button type="button" class="btn danger btn-sm" onclick="removeSaleItem(this)">Remove</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn secondary btn-sm" onclick="addSaleItem()">Add Item</button>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Discount</label>
+                        <input type="number" class="form-input" id="saleDiscount" min="0" step="0.01" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Shipping</label>
+                        <input type="number" class="form-input" id="saleShipping" min="0" step="0.01" value="0">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Payment Method</label>
+                    <select class="form-input" id="salePaymentMethod" required>
+                        <option value="">Select Payment Method</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Bank">Bank Transfer</option>
+                        <option value="Credit">Credit (Pay Later)</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                    <button type="button" class="btn secondary" onclick="closeModal('salesModal')">Cancel</button>
+                    <button type="submit" class="btn">Save Sale</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Purchase Modal -->
+    <div class="modal" id="purchaseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">New Purchase</h3>
+                <button class="close-btn" onclick="closeModal('purchaseModal')">&times;</button>
+            </div>
+            <form id="purchaseForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Supplier</label>
+                        <input type="text" class="form-input" id="purchaseSupplier" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Purchase Date</label>
+                        <input type="date" class="form-input" id="purchaseDate" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Items</label>
+                    <div id="purchaseItems">
+                        <div class="purchase-item-row form-row">
+                            <div class="form-group">
+                                <select class="form-input purchase-item-select" required>
+                                    <option value="">Select Item</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="number" class="form-input purchase-qty" placeholder="Qty" min="1" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="number" class="form-input purchase-cost" placeholder="Cost per unit" min="0" step="0.01" required>
+                            </div>
+                            <button type="button" class="btn danger btn-sm" onclick="removePurchaseItem(this)">Remove</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn secondary btn-sm" onclick="addPurchaseItem()">Add Item</button>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Payment Method</label>
+                    <select class="form-input" id="purchasePaymentMethod" required>
+                        <option value="">Select Payment Method</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Bank">Bank Transfer</option>
+                        <option value="Credit">Credit (Pay Later)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Invoice Attachment</label>
+                    <div class="file-upload" onclick="document.getElementById('purchaseAttachment').click()">
+                        <p>Click to upload invoice/receipt</p>
+                        <input type="file" id="purchaseAttachment" accept="image/*,.pdf" style="display: none;">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                    <button type="button" class="btn secondary" onclick="closeModal('purchaseModal')">Cancel</button>
+                    <button type="submit" class="btn">Save Purchase</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Expense Modal -->
+    <div class="modal" id="expenseModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Expense</h3>
+                <button class="close-btn" onclick="closeModal('expenseModal')">&times;</button>
+            </div>
+            <form id="expenseForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-input" id="expenseDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select class="form-input" id="expenseCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="SEO">SEO</option>
+                            <option value="Packing">Packing</option>
+                            <option value="Staff Wages">Staff Wages</option>
+                            <option value="Utilities">Utilities</option>
+                            <option value="Office Rent">Office Rent</option>
+                            <option value="Marketing">Marketing</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <input type="text" class="form-input" id="expenseDescription" required>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Amount</label>
+                        <input type="number" class="form-input" id="expenseAmount" min="0" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Payment Method</label>
+                        <select class="form-input" id="expensePaymentMethod" required>
+                            <option value="">Select Payment Method</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Bank">Bank Transfer</option>
+                            <option value="Credit">Credit (Pay Later)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Party/Vendor</label>
+                    <input type="text" class="form-input" id="expenseParty">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Receipt Attachment</label>
+                    <div class="file-upload" onclick="document.getElementById('expenseAttachment').click()">
+                        <p>Click to upload receipt</p>
+                        <input type="file" id="expenseAttachment" accept="image/*,.pdf" style="display: none;">
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                    <button type="button" class="btn secondary" onclick="closeModal('expenseModal')">Cancel</button>
+                    <button type="submit" class="btn">Save Expense</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Loan Modal -->
+    <div class="modal" id="loanModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Loan Transaction</h3>
+                <button class="close-btn" onclick="closeModal('loanModal')">&times;</button>
+            </div>
+            <form id="loanForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-input" id="loanDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Type</label>
+                        <select class="form-input" id="loanType" required>
+                            <option value="">Select Type</option>
+                            <option value="Disbursement">Loan Disbursement (Received)</option>
+                            <option value="Repayment">Loan Repayment (Paid Back)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Amount</label>
+                    <input type="number" class="form-input" id="loanAmount" min="0" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description/Notes</label>
+                    <input type="text" class="form-input" id="loanDescription">
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                    <button type="button" class="btn secondary" onclick="closeModal('loanModal')">Cancel</button>
+                    <button type="submit" class="btn">Save Transaction</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal" id="paymentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="paymentModalTitle">Record Payment</h3>
+                <button class="close-btn" onclick="closeModal('paymentModal')">&times;</button>
+            </div>
+            <form id="paymentForm">
+                <div class="form-group">
+                    <label class="form-label">Select Invoice</label>
+                    <select class="form-input" id="paymentInvoice" required>
+                        <option value="">Select Invoice</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Payment Date</label>
+                        <input type="date" class="form-input" id="paymentDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Amount</label>
+                        <input type="number" class="form-input" id="paymentAmount" min="0" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Payment Method</label>
+                    <select class="form-input" id="paymentMethod" required>
+                        <option value="">Select Payment Method</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Bank">Bank Transfer</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <input type="text" class="form-input" id="paymentNotes">
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                    <button type="button" class="btn secondary" onclick="closeModal('paymentModal')">Cancel</button>
+                    <button type="submit" class="btn">Record Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Transfer Modal -->
+    <div class="modal" id="transferModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Bank Transfer</h3>
+                <button class="close-btn" onclick="closeModal('transferModal')">&times;</button>
+            </div>
+            <form id="transferForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">From</label>
+                        <select class="form-input" id="transferFrom" required>
+                            <option value="">Select Source</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Bank">Bank</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">To</label>
+                        <select class="form-input" id="transferTo" required>
+                            <option value="">Select Destination</option>
+                            <option value="Cash">Cash</option>
+                            <option value="Bank">Bank</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Date</label>
+                        <input type="date" class="form-input" id="transferDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Amount</label>
+                        <input type="number" class="form-input" id="transferAmount" min="0" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <input type="text" class="form-input" id="transferDescription">
+                </div>
+
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                    <button type="button" class="btn secondary" onclick="closeModal('transferModal')">Cancel</button>
+                    <button type="submit" class="btn">Save Transfer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Backup Modal -->
+    <div class="modal" id="backupModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Backup & Restore</h3>
+                <button class="close-btn" onclick="closeModal('backupModal')">&times;</button>
+            </div>
+            
+            <div class="form-group">
+                <h4>Export Backup</h4>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                    Download a complete backup of your data including attachments.
+                </p>
+                <button class="btn" onclick="exportBackup()">📤 Download Backup</button>
+            </div>
+
+            <hr style="margin: 2rem 0; border: none; border-top: 1px solid var(--border);">
+
+            <div class="form-group">
+                <h4>Import Backup</h4>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                    Restore data from a previous backup. This will replace all current data.
+                </p>
+                <input type="file" id="backupFile" accept=".json" style="margin-bottom: 1rem;">
+                <button class="btn secondary" onclick="importBackup()">📥 Restore Backup</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // Database and core functionality
+        class BusinessDB {
+            constructor() {
+                this.db = null;
+                this.init();
+            }
+
+            async init() {
+                return new Promise((resolve, reject) => {
+                    const request = indexedDB.open('BusinessManagerDB', 1);
+                    
+                    request.onerror = () => reject(request.error);
+                    request.onsuccess = () => {
+                        this.db = request.result;
+                        resolve();
+                    };
+                    
+                    request.onupgradeneeded = (event) => {
+                        const db = event.target.result;
+                        
+                        // Create object stores
+                        if (!db.objectStoreNames.contains('inventory')) {
+                            const inventoryStore = db.createObjectStore('inventory', { keyPath: 'id', autoIncrement: true });
+                            inventoryStore.createIndex('sku', 'sku', { unique: true });
+                        }
+                        
+                        if (!db.objectStoreNames.contains('transactions')) {
+                            const transactionStore = db.createObjectStore('transactions', { keyPath: 'id', autoIncrement: true });
+                            transactionStore.createIndex('type', 'type');
+                            transactionStore.createIndex('date', 'date');
+                        }
+                        
+                        if (!db.objectStoreNames.contains('sales')) {
+                            db.createObjectStore('sales', { keyPath: 'id', autoIncrement: true });
+                        }
+                        
+                        if (!db.objectStoreNames.contains('purchases')) {
+                            db.createObjectStore('purchases', { keyPath: 'id', autoIncrement: true });
+                        }
+                        
+                        if (!db.objectStoreNames.contains('expenses')) {
+                            db.createObjectStore('expenses', { keyPath: 'id', autoIncrement: true });
+                        }
+                        
+                        if (!db.objectStoreNames.contains('loans')) {
+                            db.createObjectStore('loans', { keyPath: 'id', autoIncrement: true });
+                        }
+                        
+                        if (!db.objectStoreNames.contains('payments')) {
+                            db.createObjectStore('payments', { keyPath: 'id', autoIncrement: true });
+                        }
+                        
+                        if (!db.objectStoreNames.contains('transfers')) {
+                            db.createObjectStore('transfers', { keyPath: 'id', autoIncrement: true });
+                        }
+                        
+                        if (!db.objectStoreNames.contains('attachments')) {
+                            db.createObjectStore('attachments', { keyPath: 'id', autoIncrement: true });
+                        }
+                        
+                        if (!db.objectStoreNames.contains('settings')) {
+                            db.createObjectStore('settings', { keyPath: 'key' });
+                        }
+                    };
+                });
+            }
+
+            async add(storeName, data) {
+                data.createdAt = new Date();
+                data.updatedAt = new Date();
+                const transaction = this.db.transaction([storeName], 'readwrite');
+                const store = transaction.objectStore(storeName);
+                return store.add(data);
+            }
+
+            async update(storeName, data) {
+                data.updatedAt = new Date();
+                const transaction = this.db.transaction([storeName], 'readwrite');
+                const store = transaction.objectStore(storeName);
+                return store.put(data);
+            }
+
+            async delete(storeName, id) {
+                const transaction = this.db.transaction([storeName], 'readwrite');
+                const store = transaction.objectStore(storeName);
+                return store.delete(id);
+            }
+
+            async getAll(storeName) {
+                const transaction = this.db.transaction([storeName], 'readonly');
+                const store = transaction.objectStore(storeName);
+                return new Promise((resolve, reject) => {
+                    const request = store.getAll();
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            async get(storeName, id) {
+                const transaction = this.db.transaction([storeName], 'readonly');
+                const store = transaction.objectStore(storeName);
+                return new Promise((resolve, reject) => {
+                    const request = store.get(id);
+                    request.onsuccess = () => resolve(request.result);
+                    request.onerror = () => reject(request.error);
+                });
+            }
+
+            async clear(storeName) {
+                const transaction = this.db.transaction([storeName], 'readwrite');
+                const store = transaction.objectStore(storeName);
+                return store.clear();
+            }
+        }
+
+        // Initialize database
+        const db = new BusinessDB();
+
+        // Global state
+        const state = {
+            currentPage: 'dashboard',
+            cash: 0,
+            bank: 0,
+            loanBalance: 0,
+            editingItem: null,
+            paymentType: null
+        };
+
+        // Utility functions
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-PK', {
+                style: 'currency',
+                currency: 'PKR',
+                minimumFractionDigits: 0
+            }).format(amount || 0);
+        }
+
+        function formatDate(date) {
+            return new Date(date).toLocaleDateString('en-PK');
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast show ${type}`;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Navigation
+        function navigateTo(page) {
+            // Update active nav item
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-page="${page}"]`).classList.add('active');
+
+            // Show active page
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(page).classList.add('active');
+
+            state.currentPage = page;
+            
+            // Load page data
+            loadPageData(page);
+        }
+
+        // Modal functions
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            // Reset forms
+            const form = document.querySelector(`#${modalId} form`);
+            if (form) form.reset();
+            state.editingItem = null;
+        }
+
+        // Load page data
+        async function loadPageData(page) {
+            switch (page) {
+                case 'dashboard':
+                    await loadDashboard();
+                    break;
+                case 'inventory':
+                    await loadInventory();
+                    break;
+                case 'sales':
+                    await loadSales();
+                    break;
+                case 'purchases':
+                    await loadPurchases();
+                    break;
+                case 'expenses':
+                    await loadExpenses();
+                    break;
+                case 'loans':
+                    await loadLoans();
+                    break;
+                case 'payables':
+                    await loadPayables();
+                    break;
+                case 'receivables':
+                    await loadReceivables();
+                    break;
+                case 'banking':
+                    await loadBanking();
+                    break;
+            }
+        }
+
+        // Dashboard functions
+        async function loadDashboard() {
+            await updateSummaryChips();
+            await loadRecentTransactions();
+            await updateDashboardStats();
+        }
+
+        async function updateSummaryChips() {
+            // Calculate balances
+            const transfers = await db.getAll('transfers');
+            const sales = await db.getAll('sales');
+            const purchases = await db.getAll('purchases');
+            const expenses = await db.getAll('expenses');
+            const loans = await db.getAll('loans');
+            const payments = await db.getAll('payments');
+
+            let cash = 0, bank = 0, loanBalance = 0;
+
+            // Process transfers
+            transfers.forEach(transfer => {
+                if (transfer.from === 'Cash' && transfer.to === 'Bank') {
+                    cash -= transfer.amount;
+                    bank += transfer.amount;
+                } else if (transfer.from === 'Bank' && transfer.to === 'Cash') {
+                    bank -= transfer.amount;
+                    cash += transfer.amount;
+                }
+            });
+
+            // Process sales
+            sales.forEach(sale => {
+                if (sale.paymentMethod === 'Cash') {
+                    cash += sale.total;
+                } else if (sale.paymentMethod === 'Bank') {
+                    bank += sale.total;
+                }
+            });
+
+            // Process purchases
+            purchases.forEach(purchase => {
+                if (purchase.paymentMethod === 'Cash') {
+                    cash -= purchase.total;
+                } else if (purchase.paymentMethod === 'Bank') {
+                    bank -= purchase.total;
+                }
+            });
+
+            // Process expenses
+            expenses.forEach(expense => {
+                if (expense.paymentMethod === 'Cash') {
+                    cash -= expense.amount;
+                } else if (expense.paymentMethod === 'Bank') {
+                    bank -= expense.amount;
+                }
+            });
+
+            // Process loans
+            loans.forEach(loan => {
+                if (loan.type === 'Disbursement') {
+                    cash += loan.amount;
+                    loanBalance += loan.amount;
+                } else if (loan.type === 'Repayment') {
+                    cash -= loan.amount;
+                    loanBalance -= loan.amount;
+                }
+            });
+
+            // Process payments
+            payments.forEach(payment => {
+                if (payment.method === 'Cash') {
+                    cash -= payment.amount;
+                } else if (payment.method === 'Bank') {
+                    bank -= payment.amount;
+                }
+            });
+
+            // Calculate payables and receivables
+            let totalPayables = 0, totalReceivables = 0;
+            
+            purchases.forEach(purchase => {
+                if (purchase.paymentMethod === 'Credit') {
+                    const paid = payments.filter(p => p.invoiceId === purchase.id).reduce((sum, p) => sum + p.amount, 0);
+                    totalPayables += purchase.total - paid;
+                }
+            });
+
+            sales.forEach(sale => {
+                if (sale.paymentMethod === 'Credit') {
+                    const received = payments.filter(p => p.invoiceId === sale.id).reduce((sum, p) => sum + p.amount, 0);
+                    totalReceivables += sale.total - received;
+                }
+            });
+
+            // Update state and UI
+            state.cash = cash;
+            state.bank = bank;
+            state.loanBalance = loanBalance;
+
+            document.getElementById('cashChip').textContent = `Cash: ${formatCurrency(cash)}`;
+            document.getElementById('bankChip').textContent = `Bank: ${formatCurrency(bank)}`;
+            document.getElementById('payablesChip').textContent = `Payables: ${formatCurrency(totalPayables)}`;
+            document.getElementById('receivablesChip').textContent = `Receivables: ${formatCurrency(totalReceivables)}`;
+        }
+
+        async function updateDashboardStats() {
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+
+            const sales = await db.getAll('sales');
+            const purchases = await db.getAll('purchases');
+            const inventory = await db.getAll('inventory');
+
+            const monthlySales = sales.filter(sale => {
+                const saleDate = new Date(sale.date);
+                return saleDate.getMonth() === currentMonth && saleDate.getFullYear() === currentYear;
+            }).reduce((sum, sale) => sum + sale.total, 0);
+
+            const monthlyPurchases = purchases.filter(purchase => {
+                const purchaseDate = new Date(purchase.date);
+                return purchaseDate.getMonth() === currentMonth && purchaseDate.getFullYear() === currentYear;
+            }).reduce((sum, purchase) => sum + purchase.total, 0);
+
+            const profit = monthlySales - monthlyPurchases;
+            const lowStockItems = inventory.filter(item => item.stock <= (item.minStock || 0)).length;
+
+            document.getElementById('totalSales').textContent = formatCurrency(monthlySales);
+            document.getElementById('totalPurchases').textContent = formatCurrency(monthlyPurchases);
+            document.getElementById('profit').textContent = formatCurrency(profit);
+            document.getElementById('lowStockItems').textContent = lowStockItems;
+        }
+
+        async function loadRecentTransactions() {
+            const sales = await db.getAll('sales');
+            const purchases = await db.getAll('purchases');
+            const expenses = await db.getAll('expenses');
+
+            const allTransactions = [
+                ...sales.map(s => ({ ...s, type: 'Sale', description: `Sale to ${s.customer}` })),
+                ...purchases.map(p => ({ ...p, type: 'Purchase', description: `Purchase from ${p.supplier}`, amount: p.total })),
+                ...expenses.map(e => ({ ...e, type: 'Expense', description: e.description, amount: e.amount }))
+            ];
+
+            allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+            const recent = allTransactions.slice(0, 10);
+
+            const tbody = document.getElementById('recentTransactions');
+            tbody.innerHTML = recent.map(t => `
+                <tr>
+                    <td>${formatDate(t.date)}</td>
+                    <td>${t.type}</td>
+                    <td>${t.description}</td>
+                    <td>${formatCurrency(t.total || t.amount)}</td>
+                    <td><span class="chip ${t.paymentMethod === 'Credit' ? 'warning' : 'success'}">${t.paymentMethod || 'Paid'}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // Inventory functions
+        async function loadInventory() {
+            const inventory = await db.getAll('inventory');
+            const tbody = document.getElementById('inventoryTable');
+            
+            tbody.innerHTML = inventory.map(item => `
+                <tr>
+                    <td>${item.sku}</td>
+                    <td>${item.name}</td>
+                    <td>${item.category}</td>
+                    <td>${item.stock} ${item.stock <= (item.minStock || 0) ? '<span style="color: var(--danger);">⚠️ Low</span>' : ''}</td>
+                    <td>${formatCurrency(item.costPrice)}</td>
+                    <td>${formatCurrency(item.sellingPrice)}</td>
+                    <td>
+                        <button class="btn btn-sm" onclick="editInventoryItem(${item.id})">Edit</button>
+                        <button class="btn danger btn-sm" onclick="deleteInventoryItem(${item.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showInventoryModal() {
+            showModal('inventoryModal');
+            document.getElementById('itemSku').focus();
+        }
+
+        async function editInventoryItem(id) {
+            const item = await db.get('inventory', id);
+            state.editingItem = item;
+            
+            document.getElementById('itemSku').value = item.sku;
+            document.getElementById('itemName').value = item.name;
+            document.getElementById('itemCategory').value = item.category;
+            document.getElementById('itemMinStock').value = item.minStock || '';
+            document.getElementById('itemCostPrice').value = item.costPrice;
+            document.getElementById('itemSellingPrice').value = item.sellingPrice;
+            document.getElementById('itemStock').value = item.stock;
+            
+            showModal('inventoryModal');
+        }
+
+        async function deleteInventoryItem(id) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                await db.delete('inventory', id);
+                await loadInventory();
+                showToast('Item deleted successfully');
+            }
+        }
+
+        // Sales functions
+        async function loadSales() {
+            const sales = await db.getAll('sales');
+            const tbody = document.getElementById('salesTable');
+            
+            tbody.innerHTML = sales.map(sale => `
+                <tr>
+                    <td>${sale.invoiceNumber}</td>
+                    <td>${formatDate(sale.date)}</td>
+                    <td>${sale.customer}</td>
+                    <td>${sale.items.length} items</td>
+                    <td>${formatCurrency(sale.total)}</td>
+                    <td><span class="chip ${sale.paymentMethod === 'Credit' ? 'warning' : 'success'}">${sale.paymentMethod}</span></td>
+                    <td>
+                        <button class="btn btn-sm" onclick="viewSale(${sale.id})">View</button>
+                        <button class="btn danger btn-sm" onclick="deleteSale(${sale.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showSalesModal() {
+            showModal('salesModal');
+            loadSaleItems();
+            document.getElementById('saleDate').value = new Date().toISOString().split('T')[0];
+        }
+
+        async function loadSaleItems() {
+            const inventory = await db.getAll('inventory');
+            const selects = document.querySelectorAll('.sale-item-select');
+            
+            selects.forEach(select => {
+                select.innerHTML = '<option value="">Select Item</option>' + 
+                    inventory.map(item => `<option value="${item.id}">${item.name} (${item.sku}) - Stock: ${item.stock}</option>`).join('');
+            });
+        }
+
+        function addSaleItem() {
+            const container = document.getElementById('saleItems');
+            const newRow = document.createElement('div');
+            newRow.className = 'sale-item-row form-row';
+            newRow.innerHTML = `
+                <div class="form-group">
+                    <select class="form-input sale-item-select" required>
+                        <option value="">Select Item</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-input sale-qty" placeholder="Qty" min="1" required>
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-input sale-price" placeholder="Price" min="0" step="0.01" required>
+                </div>
+                <button type="button" class="btn danger btn-sm" onclick="removeSaleItem(this)">Remove</button>
+            `;
+            container.appendChild(newRow);
+            loadSaleItems();
+        }
+
+        function removeSaleItem(button) {
+            button.parentElement.remove();
+        }
+
+        // Purchase functions
+        async function loadPurchases() {
+            const purchases = await db.getAll('purchases');
+            const tbody = document.getElementById('purchasesTable');
+            
+            tbody.innerHTML = purchases.map(purchase => `
+                <tr>
+                    <td>${formatDate(purchase.date)}</td>
+                    <td>${purchase.supplier}</td>
+                    <td>${purchase.items.length} items</td>
+                    <td>${formatCurrency(purchase.total)}</td>
+                    <td>${purchase.paymentMethod}</td>
+                    <td><span class="chip ${purchase.paymentMethod === 'Credit' ? 'warning' : 'success'}">${purchase.paymentMethod}</span></td>
+                    <td>
+                        <button class="btn btn-sm" onclick="viewPurchase(${purchase.id})">View</button>
+                        <button class="btn danger btn-sm" onclick="deletePurchase(${purchase.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showPurchaseModal() {
+            showModal('purchaseModal');
+            loadPurchaseItems();
+            document.getElementById('purchaseDate').value = new Date().toISOString().split('T')[0];
+        }
+
+        async function loadPurchaseItems() {
+            const inventory = await db.getAll('inventory');
+            const selects = document.querySelectorAll('.purchase-item-select');
+            
+            selects.forEach(select => {
+                select.innerHTML = '<option value="">Select Item</option>' + 
+                    inventory.map(item => `<option value="${item.id}">${item.name} (${item.sku})</option>`).join('');
+            });
+        }
+
+        function addPurchaseItem() {
+            const container = document.getElementById('purchaseItems');
+            const newRow = document.createElement('div');
+            newRow.className = 'purchase-item-row form-row';
+            newRow.innerHTML = `
+                <div class="form-group">
+                    <select class="form-input purchase-item-select" required>
+                        <option value="">Select Item</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-input purchase-qty" placeholder="Qty" min="1" required>
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-input purchase-cost" placeholder="Cost per unit" min="0" step="0.01" required>
+                </div>
+                <button type="button" class="btn danger btn-sm" onclick="removePurchaseItem(this)">Remove</button>
+            `;
+            container.appendChild(newRow);
+            loadPurchaseItems();
+        }
+
+        function removePurchaseItem(button) {
+            button.parentElement.remove();
+        }
+
+        // Expense functions
+        async function loadExpenses() {
+            const expenses = await db.getAll('expenses');
+            const tbody = document.getElementById('expensesTable');
+            
+            tbody.innerHTML = expenses.map(expense => `
+                <tr>
+                    <td>${formatDate(expense.date)}</td>
+                    <td>${expense.category}</td>
+                    <td>${expense.description}</td>
+                    <td>${formatCurrency(expense.amount)}</td>
+                    <td>${expense.paymentMethod}</td>
+                    <td>
+                        <button class="btn btn-sm" onclick="editExpense(${expense.id})">Edit</button>
+                        <button class="btn danger btn-sm" onclick="deleteExpense(${expense.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showExpenseModal() {
+            showModal('expenseModal');
+            document.getElementById('expenseDate').value = new Date().toISOString().split('T')[0];
+        }
+
+        // Loan functions
+        async function loadLoans() {
+            const loans = await db.getAll('loans');
+            let balance = 0;
+            
+            const tbody = document.getElementById('loansTable');
+            tbody.innerHTML = loans.map(loan => {
+                if (loan.type === 'Disbursement') {
+                    balance += loan.amount;
+                } else {
+                    balance -= loan.amount;
+                }
+                
+                return `
+                    <tr>
+                        <td>${formatDate(loan.date)}</td>
+                        <td>${loan.type}</td>
+                        <td>${formatCurrency(loan.amount)}</td>
+                        <td>${loan.description || '-'}</td>
+                        <td>${formatCurrency(balance)}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            document.getElementById('totalLoanBalance').textContent = formatCurrency(balance);
+        }
+
+        function showLoanModal() {
+            showModal('loanModal');
+            document.getElementById('loanDate').value = new Date().toISOString().split('T')[0];
+        }
+
+        // Payables and Receivables functions
+        async function loadPayables() {
+            const purchases = await db.getAll('purchases');
+            const payments = await db.getAll('payments');
+            const tbody = document.getElementById('payablesTable');
+            
+            const payables = purchases.filter(p => p.paymentMethod === 'Credit').map(purchase => {
+                const paid = payments.filter(payment => payment.invoiceId === purchase.id).reduce((sum, p) => sum + p.amount, 0);
+                const outstanding = purchase.total - paid;
+                const dueDate = new Date(purchase.date);
+                dueDate.setDate(dueDate.getDate() + 30); // Assume 30 days credit terms
+                const daysOverdue = Math.max(0, Math.floor((new Date() - dueDate) / (1000 * 60 * 60 * 24)));
+                
+                return {
+                    ...purchase,
+                    paid,
+                    outstanding,
+                    dueDate,
+                    daysOverdue
+                };
+            }).filter(p => p.outstanding > 0);
+            
+            tbody.innerHTML = payables.map(payable => `
+                <tr>
+                    <td>${payable.supplier}</td>
+                    <td>PUR-${payable.id}</td>
+                    <td>${formatDate(payable.date)}</td>
+                    <td>${formatDate(payable.dueDate)}</td>
+                    <td>${formatCurrency(payable.total)}</td>
+                    <td>${formatCurrency(payable.paid)}</td>
+                    <td>${formatCurrency(payable.outstanding)}</td>
+                    <td>${payable.daysOverdue > 0 ? `${payable.daysOverdue} days` : '-'}</td>
+                    <td>
+                        <button class="btn btn-sm" onclick="recordPayment(${payable.id}, 'payable')">Pay</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadReceivables() {
+            const sales = await db.getAll('sales');
+            const payments = await db.getAll('payments');
+            const tbody = document.getElementById('receivablesTable');
+            
+            const receivables = sales.filter(s => s.paymentMethod === 'Credit').map(sale => {
+                const received = payments.filter(payment => payment.invoiceId === sale.id).reduce((sum, p) => sum + p.amount, 0);
+                const outstanding = sale.total - received;
+                const dueDate = new Date(sale.date);
+                dueDate.setDate(dueDate.getDate() + 30); // Assume 30 days credit terms
+                const daysOverdue = Math.max(0, Math.floor((new Date() - dueDate) / (1000 * 60 * 60 * 24)));
+                
+                return {
+                    ...sale,
+                    received,
+                    outstanding,
+                    dueDate,
+                    daysOverdue
+                };
+            }).filter(r => r.outstanding > 0);
+            
+            tbody.innerHTML = receivables.map(receivable => `
+                <tr>
+                    <td>${receivable.customer}</td>
+                    <td>${receivable.invoiceNumber}</td>
+                    <td>${formatDate(receivable.date)}</td>
+                    <td>${formatDate(receivable.dueDate)}</td>
+                    <td>${formatCurrency(receivable.total)}</td>
+                    <td>${formatCurrency(receivable.received)}</td>
+                    <td>${formatCurrency(receivable.outstanding)}</td>
+                    <td>${receivable.daysOverdue > 0 ? `${receivable.daysOverdue} days` : '-'}</td>
+                    <td>
+                        <button class="btn btn-sm" onclick="recordPayment(${receivable.id}, 'receivable')">Receive</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function showPaymentModal(type) {
+            state.paymentType = type;
+            const modal = document.getElementById('paymentModal');
+            const title = document.getElementById('paymentModalTitle');
+            
+            title.textContent = type === 'payable' ? 'Record Payment' : 'Record Receipt';
+            loadPaymentInvoices(type);
+            showModal('paymentModal');
+            document.getElementById('paymentDate').value = new Date().toISOString().split('T')[0];
+        }
+
+        async function loadPaymentInvoices(type) {
+            const select = document.getElementById('paymentInvoice');
+            
+            if (type === 'payable') {
+                const purchases = await db.getAll('purchases');
+                const payments = await db.getAll('payments');
+                
+                const unpaidPurchases = purchases.filter(p => p.paymentMethod === 'Credit').filter(purchase => {
+                    const paid = payments.filter(payment => payment.invoiceId === purchase.id).reduce((sum, p) => sum + p.amount, 0);
+                    return purchase.total - paid > 0;
+                });
+                
+                select.innerHTML = '<option value="">Select Invoice</option>' + 
+                    unpaidPurchases.map(p => `<option value="${p.id}">PUR-${p.id} - ${p.supplier} - ${formatCurrency(p.total)}</option>`).join('');
+            } else {
+                const sales = await db.getAll('sales');
+                const payments = await db.getAll('payments');
+                
+                const unpaidSales = sales.filter(s => s.paymentMethod === 'Credit').filter(sale => {
+                    const received = payments.filter(payment => payment.invoiceId === sale.id).reduce((sum, p) => sum + p.amount, 0);
+                    return sale.total - received > 0;
+                });
+                
+                select.innerHTML = '<option value="">Select Invoice</option>' + 
+                    unpaidSales.map(s => `<option value="${s.id}">${s.invoiceNumber} - ${s.customer} - ${formatCurrency(s.total)}</option>`).join('');
+            }
+        }
+
+        function recordPayment(invoiceId, type) {
+            state.paymentType = type;
+            document.getElementById('paymentInvoice').value = invoiceId;
+            showPaymentModal(type);
+        }
+
+        // Banking functions
+        async function loadBanking() {
+            const transfers = await db.getAll('transfers');
+            const tbody = document.getElementById('bankingTable');
+            
+            tbody.innerHTML = transfers.map(transfer => `
+                <tr>
+                    <td>${formatDate(transfer.date)}</td>
+                    <td>Transfer</td>
+                    <td>${transfer.description || 'Fund Transfer'}</td>
+                    <td>${transfer.from}</td>
+                    <td>${transfer.to}</td>
+                    <td>${formatCurrency(transfer.amount)}</td>
+                </tr>
+            `).join('');
+
+            // Update balance displays
+            document.getElementById('cashBalance').textContent = formatCurrency(state.cash);
+            document.getElementById('bankBalance').textContent = formatCurrency(state.bank);
+        }
+
+        function showTransferModal() {
+            showModal('transferModal');
+            document.getElementById('transferDate').value = new Date().toISOString().split('T')[0];
+        }
+
+        // Form handlers
+        document.getElementById('inventoryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = {
+                sku: document.getElementById('itemSku').value,
+                name: document.getElementById('itemName').value,
+                category: document.getElementById('itemCategory').value,
+                minStock: parseInt(document.getElementById('itemMinStock').value) || 0,
+                costPrice: parseFloat(document.getElementById('itemCostPrice').value),
+                sellingPrice: parseFloat(document.getElementById('itemSellingPrice').value),
+                stock: parseInt(document.getElementById('itemStock').value) || 0
+            };
+            
+            try {
+                if (state.editingItem) {
+                    formData.id = state.editingItem.id;
+                    await db.update('inventory', formData);
+                    showToast('Item updated successfully');
+                } else {
+                    await db.add('inventory', formData);
+                    showToast('Item added successfully');
+                }
+                
+                closeModal('inventoryModal');
+                await loadInventory();
+            } catch (error) {
+                showToast('Error saving item: ' + error.message, 'error');
+            }
+        });
+
+        document.getElementById('salesForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const items = [];
+            const itemRows = document.querySelectorAll('.sale-item-row');
+            
+            for (const row of itemRows) {
+                const itemId = parseInt(row.querySelector('.sale-item-select').value);
+                const qty = parseInt(row.querySelector('.sale-qty').value);
+                const price = parseFloat(row.querySelector('.sale-price').value);
+                
+                if (itemId && qty && price) {
+                    const item = await db.get('inventory', itemId);
+                    
+                    if (item.stock < qty) {
+                        showToast(`Insufficient stock for ${item.name}. Available: ${item.stock}`, 'error');
+                        return;
+                    }
+                    
+                    items.push({
+                        itemId,
+                        name: item.name,
+                        sku: item.sku,
+                        qty,
+                        price,
+                        total: qty * price
+                    });
+                }
+            }
+            
+            if (items.length === 0) {
+                showToast('Please add at least one item', 'error');
+                return;
+            }
+            
+            const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+            const discount = parseFloat(document.getElementById('saleDiscount').value) || 0;
+            const shipping = parseFloat(document.getElementById('saleShipping').value) || 0;
+            const total = subtotal - discount + shipping;
+            
+            const saleData = {
+                invoiceNumber: 'INV-' + Date.now(),
+                customer: document.getElementById('saleCustomer').value,
+                date: document.getElementById('saleDate').value,
+                items,
+                subtotal,
+                discount,
+                shipping,
+                total,
+                paymentMethod: document.getElementById('salePaymentMethod').value
+            };
+            
+            try {
+                await db.add('sales', saleData);
+                
+                // Update inventory
+                for (const item of items) {
+                    const inventoryItem = await db.get('inventory', item.itemId);
+                    inventoryItem.stock -= item.qty;
+                    await db.update('inventory', inventoryItem);
+                }
+                
+                showToast('Sale recorded successfully');
+                closeModal('salesModal');
+                await loadSales();
+                await updateSummaryChips();
+            } catch (error) {
+                showToast('Error recording sale: ' + error.message, 'error');
+            }
+        });
+
+        document.getElementById('purchaseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const items = [];
+            const itemRows = document.querySelectorAll('.purchase-item-row');
+            
+            for (const row of itemRows) {
+                const itemId = parseInt(row.querySelector('.purchase-item-select').value);
+                const qty = parseInt(row.querySelector('.purchase-qty').value);
+                const cost = parseFloat(row.querySelector('.purchase-cost').value);
+                
+                if (itemId && qty && cost) {
+                    const item = await db.get('inventory', itemId);
+                    items.push({
+                        itemId,
+                        name: item.name,
+                        sku: item.sku,
+                        qty,
+                        cost,
+                        total: qty * cost
+                    });
+                }
+            }
+            
+            if (items.length === 0) {
+                showToast('Please add at least one item', 'error');
+                return;
+            }
+            
+            const total = items.reduce((sum, item) => sum + item.total, 0);
+            
+            const purchaseData = {
+                supplier: document.getElementById('purchaseSupplier').value,
+                date: document.getElementById('purchaseDate').value,
+                items,
+                total,
+                paymentMethod: document.getElementById('purchasePaymentMethod').value
+            };
+            
+            try {
+                await db.add('purchases', purchaseData);
+                
+                // Update inventory
+                for (const item of items) {
+                    const inventoryItem = await db.get('inventory', item.itemId);
+                    inventoryItem.stock += item.qty;
+                    await db.update('inventory', inventoryItem);
+                }
+                
+                showToast('Purchase recorded successfully');
+                closeModal('purchaseModal');
+                await loadPurchases();
+                await updateSummaryChips();
+            } catch (error) {
+                showToast('Error recording purchase: ' + error.message, 'error');
+            }
+        });
+
+        document.getElementById('expenseForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const expenseData = {
+                date: document.getElementById('expenseDate').value,
+                category: document.getElementById('expenseCategory').value,
+                description: document.getElementById('expenseDescription').value,
+                amount: parseFloat(document.getElementById('expenseAmount').value),
+                paymentMethod: document.getElementById('expensePaymentMethod').value,
+                party: document.getElementById('expenseParty').value
+            };
+            
+            try {
+                await db.add('expenses', expenseData);
+                showToast('Expense recorded successfully');
+                closeModal('expenseModal');
+                await loadExpenses();
+                await updateSummaryChips();
+            } catch (error) {
+                showToast('Error recording expense: ' + error.message, 'error');
+            }
+        });
+
+        document.getElementById('loanForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const loanData = {
+                date: document.getElementById('loanDate').value,
+                type: document.getElementById('loanType').value,
+                amount: parseFloat(document.getElementById('loanAmount').value),
+                description: document.getElementById('loanDescription').value
+            };
+            
+            try {
+                await db.add('loans', loanData);
+                showToast('Loan transaction recorded successfully');
+                closeModal('loanModal');
+                await loadLoans();
+                await updateSummaryChips();
+            } catch (error) {
+                showToast('Error recording loan transaction: ' + error.message, 'error');
+            }
+        });
+
+        document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const paymentData = {
+                invoiceId: parseInt(document.getElementById('paymentInvoice').value),
+                date: document.getElementById('paymentDate').value,
+                amount: parseFloat(document.getElementById('paymentAmount').value),
+                method: document.getElementById('paymentMethod').value,
+                notes: document.getElementById('paymentNotes').value,
+                type: state.paymentType
+            };
+            
+            try {
+                await db.add('payments', paymentData);
+                showToast('Payment recorded successfully');
+                closeModal('paymentModal');
+                
+                if (state.paymentType === 'payable') {
+                    await loadPayables();
+                } else {
+                    await loadReceivables();
+                }
+                
+                await updateSummaryChips();
+            } catch (error) {
+                showToast('Error recording payment: ' + error.message, 'error');
+            }
+        });
+
+        document.getElementById('transferForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const from = document.getElementById('transferFrom').value;
+            const to = document.getElementById('transferTo').value;
+            const amount = parseFloat(document.getElementById('transferAmount').value);
+            
+            if (from === to) {
+                showToast('Source and destination cannot be the same', 'error');
+                return;
+            }
+            
+            if (from === 'Cash' && amount > state.cash) {
+                showToast('Insufficient cash balance', 'error');
+                return;
+            }
+            
+            if (from === 'Bank' && amount > state.bank) {
+                showToast('Insufficient bank balance', 'error');
+                return;
+            }
+            
+            const transferData = {
+                date: document.getElementById('transferDate').value,
+                from,
+                to,
+                amount,
+                description: document.getElementById('transferDescription').value
+            };
+            
+            try {
+                await db.add('transfers', transferData);
+                showToast('Transfer recorded successfully');
+                closeModal('transferModal');
+                await loadBanking();
+                await updateSummaryChips();
+            } catch (error) {
+                showToast('Error recording transfer: ' + error.message, 'error');
+            }
+        });
+
+        // Demo data function
+        async function loadDemoData() {
+            if (!confirm('This will add demo data to your database. Continue?')) return;
+            
+            try {
+                // Add demo inventory items
+                const demoInventory = [
+                    { sku: 'SHIRT001', name: 'Cotton T-Shirt', category: 'Shirts', costPrice: 500, sellingPrice: 800, stock: 50, minStock: 10 },
+                    { sku: 'PANTS001', name: 'Jeans', category: 'Pants', costPrice: 1200, sellingPrice: 2000, stock: 30, minStock: 5 },
+                    { sku: 'ACC001', name: 'Leather Belt', category: 'Accessories', costPrice: 300, sellingPrice: 600, stock: 25, minStock: 5 }
+                ];
+                
+                for (const item of demoInventory) {
+                    await db.add('inventory', item);
+                }
+                
+                // Add demo purchases
+                const demoPurchases = [
+                    {
+                        supplier: 'ABC Textiles',
+                        date: '2024-01-15',
+                        items: [{ itemId: 1, name: 'Cotton T-Shirt', sku: 'SHIRT001', qty: 50, cost: 500, total: 25000 }],
+                        total: 25000,
+                        paymentMethod: 'Cash'
+                    },
+                    {
+                        supplier: 'XYZ Garments',
+                        date: '2024-01-20',
+                        items: [{ itemId: 2, name: 'Jeans', sku: 'PANTS001', qty: 30, cost: 1200, total: 36000 }],
+                        total: 36000,
+                        paymentMethod: 'Credit'
+                    }
+                ];
+                
+                for (const purchase of demoPurchases) {
+                    await db.add('purchases', purchase);
+                }
+                
+                // Add demo sales
+                const demoSales = [
+                    {
+                        invoiceNumber: 'INV-001',
+                        customer: 'John Doe',
+                        date: '2024-01-25',
+                        items: [{ itemId: 1, name: 'Cotton T-Shirt', sku: 'SHIRT001', qty: 2, price: 800, total: 1600 }],
+                        subtotal: 1600,
+                        discount: 0,
+                        shipping: 150,
+                        total: 1750,
+                        paymentMethod: 'Cash'
+                    },
+                    {
+                        invoiceNumber: 'INV-002',
+                        customer: 'Jane Smith',
+                        date: '2024-01-28',
+                        items: [{ itemId: 2, name: 'Jeans', sku: 'PANTS001', qty: 1, price: 2000, total: 2000 }],
+                        subtotal: 2000,
+                        discount: 100,
+                        shipping: 200,
+                        total: 2100,
+                        paymentMethod: 'Bank'
+                    }
+                ];
+                
+                for (const sale of demoSales) {
+                    await db.add('sales', sale);
+                }
+                
+                // Add demo expenses
+                const demoExpenses = [
+                    { date: '2024-01-30', category: 'SEO', description: 'Monthly SEO Service', amount: 5000, paymentMethod: 'Bank', party: 'SEO Agency' },
+                    { date: '2024-02-01', category: 'Packing', description: 'Packaging Materials', amount: 2000, paymentMethod: 'Cash', party: 'Pack Supplies' }
+                ];
+                
+                for (const expense of demoExpenses) {
+                    await db.add('expenses', expense);
+                }
+                
+                // Add demo loan transaction
+                await db.add('loans', {
+                    date: '2024-01-10',
+                    type: 'Disbursement',
+                    amount: 50000,
+                    description: 'Initial business loan from brother'
+                });
+                
+                showToast('Demo data loaded successfully');
+                await loadPageData(state.currentPage);
+            } catch (error) {
+                showToast('Error loading demo data: ' + error.message, 'error');
+            }
+        }
+
+        // Backup and export functions
+        async function exportBackup() {
+            try {
+                const backup = {
+                    version: '1.0',
+                    timestamp: new Date().toISOString(),
+                    data: {}
+                };
+                
+                const stores = ['inventory', 'sales', 'purchases', 'expenses', 'loans', 'payments', 'transfers', 'attachments', 'settings'];
+                
+                for (const store of stores) {
+                    backup.data[store] = await db.getAll(store);
+                }
+                
+                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `business-backup-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showToast('Backup exported successfully');
+            } catch (error) {
+                showToast('Error exporting backup: ' + error.message, 'error');
+            }
+        }
+
+        async function importBackup() {
+            const fileInput = document.getElementById('backupFile') || document.getElementById('importFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showToast('Please select a backup file', 'error');
+                return;
+            }
+            
+            if (!confirm('This will replace all current data. Are you sure?')) {
+                return;
+            }
+            
+            try {
+                const text = await file.text();
+                const backup = JSON.parse(text);
+                
+                if (!backup.data) {
+                    throw new Error('Invalid backup file format');
+                }
+                
+                // Clear existing data
+                const stores = ['inventory', 'sales', 'purchases', 'expenses', 'loans', 'payments', 'transfers', 'attachments', 'settings'];
+                for (const store of stores) {
+                    await db.clear(store);
+                }
+                
+                // Import backup data
+                for (const [store, data] of Object.entries(backup.data)) {
+                    if (Array.isArray(data)) {
+                        for (const item of data) {
+                            await db.add(store, item);
+                        }
+                    }
+                }
+                
+                showToast('Backup imported successfully');
+                closeModal('backupModal');
+                await loadPageData(state.currentPage);
+                await updateSummaryChips();
+            } catch (error) {
+                showToast('Error importing backup: ' + error.message, 'error');
+            }
+        }
+
+        function showBackupModal() {
+            showModal('backupModal');
+        }
+
+        async function clearAllData() {
+            if (!confirm('This will permanently delete ALL data. Type "DELETE" to confirm:')) {
+                return;
+            }
+            
+            const confirmation = prompt('Type "DELETE" to confirm:');
+            if (confirmation !== 'DELETE') {
+                return;
+            }
+            
+            try {
+                const stores = ['inventory', 'sales', 'purchases', 'expenses', 'loans', 'payments', 'transfers', 'attachments'];
+                for (const store of stores) {
+                    await db.clear(store);
+                }
+                
+                showToast('All data cleared successfully');
+                await loadPageData(state.currentPage);
+                await updateSummaryChips();
+            } catch (error) {
+                showToast('Error clearing data: ' + error.message, 'error');
+            }
+        }
+
+        // Export functions
+        function exportInventoryCSV() {
+            db.getAll('inventory').then(inventory => {
+                const csv = [
+                    ['SKU', 'Name', 'Category', 'Stock', 'Cost Price', 'Selling Price', 'Min Stock'].join(','),
+                    ...inventory.map(item => [
+                        item.sku,
+                        item.name,
+                        item.category,
+                        item.stock,
+                        item.costPrice,
+                        item.sellingPrice,
+                        item.minStock || 0
+                    ].join(','))
+                ].join('\n');
+                
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'inventory.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        // Reports function
+        async function generateReport() {
+            const fromDate = document.getElementById('reportFromDate').value;
+            const toDate = document.getElementById('reportToDate').value;
+            const reportType = document.getElementById('reportType').value;
+            
+            if (!fromDate || !toDate) {
+                showToast('Please select date range', 'error');
+                return;
+            }
+            
+            const output = document.getElementById('reportOutput');
+            
+            try {
+                switch (reportType) {
+                    case 'profit-loss':
+                        await generateProfitLossReport(fromDate, toDate, output);
+                        break;
+                    case 'cash-flow':
+                        await generateCashFlowReport(fromDate, toDate, output);
+                        break;
+                    case 'sales-report':
+                        await generateSalesReport(fromDate, toDate, output);
+                        break;
+                    case 'purchase-report':
+                        await generatePurchaseReport(fromDate, toDate, output);
+                        break;
+                    case 'expense-report':
+                        await generateExpenseReport(fromDate, toDate, output);
+                        break;
+                    case 'inventory-valuation':
+                        await generateInventoryValuation(output);
+                        break;
+                }
+            } catch (error) {
+                showToast('Error generating report: ' + error.message, 'error');
+            }
+        }
+
+        async function generateProfitLossReport(fromDate, toDate, output) {
+            const sales = await db.getAll('sales');
+            const purchases = await db.getAll('purchases');
+            const expenses = await db.getAll('expenses');
+            
+            const filteredSales = sales.filter(s => s.date >= fromDate && s.date <= toDate);
+            const filteredPurchases = purchases.filter(p => p.date >= fromDate && p.date <= toDate);
+            const filteredExpenses = expenses.filter(e => e.date >= fromDate && e.date <= toDate);
+            
+            const totalRevenue = filteredSales.reduce((sum, s) => sum + s.total, 0);
+            const totalCOGS = filteredPurchases.reduce((sum, p) => sum + p.total, 0);
+            const totalExpenses = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
+            
+            const grossProfit = totalRevenue - totalCOGS;
+            const netProfit = grossProfit - totalExpenses;
+            
+            output.innerHTML = `
+                <div class="card">
+                    <h3>Profit & Loss Statement</h3>
+                    <p><strong>Period:</strong> ${formatDate(fromDate)} to ${formatDate(toDate)}</p>
+                    
+                    <table class="table">
+                        <tr><td><strong>Revenue</strong></td><td><strong>${formatCurrency(totalRevenue)}</strong></td></tr>
+                        <tr><td>Cost of Goods Sold</td><td>${formatCurrency(totalCOGS)}</td></tr>
+                        <tr><td><strong>Gross Profit</strong></td><td><strong>${formatCurrency(grossProfit)}</strong></td></tr>
+                        <tr><td>Operating Expenses</td><td>${formatCurrency(totalExpenses)}</td></tr>
+                        <tr><td><strong>Net Profit</strong></td><td><strong style="color: ${netProfit >= 0 ? 'var(--success)' : 'var(--danger)'}">${formatCurrency(netProfit)}</strong></td></tr>
+                    </table>
+                    
+                    <button class="btn" onclick="exportReportPDF('profit-loss')">Export PDF</button>
+                </div>
+            `;
+        }
+
+        async function generateCashFlowReport(fromDate, toDate, output) {
+            const sales = await db.getAll('sales');
+            const purchases = await db.getAll('purchases');
+            const expenses = await db.getAll('expenses');
+            const loans = await db.getAll('loans');
+            const transfers = await db.getAll('transfers');
+            
+            const filteredSales = sales.filter(s => s.date >= fromDate && s.date <= toDate && s.paymentMethod !== 'Credit');
+            const filteredPurchases = purchases.filter(p => p.date >= fromDate && p.date <= toDate && p.paymentMethod !== 'Credit');
+            const filteredExpenses = expenses.filter(e => e.date >= fromDate && e.date <= toDate && e.paymentMethod !== 'Credit');
+            const filteredLoans = loans.filter(l => l.date >= fromDate && l.date <= toDate);
+            
+            const cashFromSales = filteredSales.reduce((sum, s) => sum + s.total, 0);
+            const cashFromLoans = filteredLoans.filter(l => l.type === 'Disbursement').reduce((sum, l) => sum + l.amount, 0);
+            const totalCashIn = cashFromSales + cashFromLoans;
+            
+            const cashToPurchases = filteredPurchases.reduce((sum, p) => sum + p.total, 0);
+            const cashToExpenses = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
+            const cashToLoanRepayments = filteredLoans.filter(l => l.type === 'Repayment').reduce((sum, l) => sum + l.amount, 0);
+            const totalCashOut = cashToPurchases + cashToExpenses + cashToLoanRepayments;
+            
+            const netCashFlow = totalCashIn - totalCashOut;
+            
+            output.innerHTML = `
+                <div class="card">
+                    <h3>Cash Flow Statement</h3>
+                    <p><strong>Period:</strong> ${formatDate(fromDate)} to ${formatDate(toDate)}</p>
+                    
+                    <table class="table">
+                        <tr><th colspan="2">Cash Inflows</th></tr>
+                        <tr><td>Cash from Sales</td><td>${formatCurrency(cashFromSales)}</td></tr>
+                        <tr><td>Cash from Loans</td><td>${formatCurrency(cashFromLoans)}</td></tr>
+                        <tr><td><strong>Total Cash In</strong></td><td><strong>${formatCurrency(totalCashIn)}</strong></td></tr>
+                        
+                        <tr><th colspan="2">Cash Outflows</th></tr>
+                        <tr><td>Cash to Purchases</td><td>${formatCurrency(cashToPurchases)}</td></tr>
+                        <tr><td>Cash to Expenses</td><td>${formatCurrency(cashToExpenses)}</td></tr>
+                        <tr><td>Loan Repayments</td><td>${formatCurrency(cashToLoanRepayments)}</td></tr>
+                        <tr><td><strong>Total Cash Out</strong></td><td><strong>${formatCurrency(totalCashOut)}</strong></td></tr>
+                        
+                        <tr><td><strong>Net Cash Flow</strong></td><td><strong style="color: ${netCashFlow >= 0 ? 'var(--success)' : 'var(--danger)'}">${formatCurrency(netCashFlow)}</strong></td></tr>
+                    </table>
+                    
+                    <button class="btn" onclick="exportReportPDF('cash-flow')">Export PDF</button>
+                </div>
+            `;
+        }
+
+        async function generateSalesReport(fromDate, toDate, output) {
+            const sales = await db.getAll('sales');
+            const filteredSales = sales.filter(s => s.date >= fromDate && s.date <= toDate);
+            
+            const totalSales = filteredSales.reduce((sum, s) => sum + s.total, 0);
+            const avgOrderValue = filteredSales.length ? totalSales / filteredSales.length : 0;
+            
+            output.innerHTML = `
+                <div class="card">
+                    <h3>Sales Report</h3>
+                    <p><strong>Period:</strong> ${formatDate(fromDate)} to ${formatDate(toDate)}</p>
+                    
+                    <div class="dashboard-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">${filteredSales.length}</div>
+                            <div class="stat-label">Total Orders</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${formatCurrency(totalSales)}</div>
+                            <div class="stat-label">Total Revenue</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${formatCurrency(avgOrderValue)}</div>
+                            <div class="stat-label">Average Order Value</div>
+                        </div>
+                    </div>
+                    
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Invoice</th>
+                                <th>Date</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Payment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filteredSales.map(sale => `
+                                <tr>
+                                    <td>${sale.invoiceNumber}</td>
+                                    <td>${formatDate(sale.date)}</td>
+                                    <td>${sale.customer}</td>
+                                    <td>${sale.items.length}</td>
+                                    <td>${formatCurrency(sale.total)}</td>
+                                    <td>${sale.paymentMethod}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <button class="btn" onclick="exportReportCSV('sales')">Export CSV</button>
+                </div>
+            `;
+        }
+
+        async function generatePurchaseReport(fromDate, toDate, output) {
+            const purchases = await db.getAll('purchases');
+            const filteredPurchases = purchases.filter(p => p.date >= fromDate && p.date <= toDate);
+            
+            const totalPurchases = filteredPurchases.reduce((sum, p) => sum + p.total, 0);
+            
+            output.innerHTML = `
+                <div class="card">
+                    <h3>Purchase Report</h3>
+                    <p><strong>Period:</strong> ${formatDate(fromDate)} to ${formatDate(toDate)}</p>
+                    
+                    <div class="dashboard-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">${filteredPurchases.length}</div>
+                            <div class="stat-label">Total Purchases</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${formatCurrency(totalPurchases)}</div>
+                            <div class="stat-label">Total Amount</div>
+                        </div>
+                    </div>
+                    
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Supplier</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Payment</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filteredPurchases.map(purchase => `
+                                <tr>
+                                    <td>${formatDate(purchase.date)}</td>
+                                    <td>${purchase.supplier}</td>
+                                    <td>${purchase.items.length}</td>
+                                    <td>${formatCurrency(purchase.total)}</td>
+                                    <td>${purchase.paymentMethod}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <button class="btn" onclick="exportReportCSV('purchases')">Export CSV</button>
+                </div>
+            `;
+        }
+
+        async function generateExpenseReport(fromDate, toDate, output) {
+            const expenses = await db.getAll('expenses');
+            const filteredExpenses = expenses.filter(e => e.date >= fromDate && e.date <= toDate);
+            
+            const categoryTotals = {};
+            filteredExpenses.forEach(expense => {
+                categoryTotals[expense.category] = (categoryTotals[expense.category] || 0) + expense.amount;
+            });
+            
+            const totalExpenses = filteredExpenses.reduce((sum, e) => sum + e.amount, 0);
+            
+            output.innerHTML = `
+                <div class="card">
+                    <h3>Expense Report</h3>
+                    <p><strong>Period:</strong> ${formatDate(fromDate)} to ${formatDate(toDate)}</p>
+                    
+                    <div class="stat-card" style="margin-bottom: 1rem;">
+                        <div class="stat-value">${formatCurrency(totalExpenses)}</div>
+                        <div class="stat-label">Total Expenses</div>
+                    </div>
+                    
+                    <h4>Expenses by Category</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${Object.entries(categoryTotals).map(([category, amount]) => `
+                                <tr>
+                                    <td>${category}</td>
+                                    <td>${formatCurrency(amount)}</td>
+                                    <td>${((amount / totalExpenses) * 100).toFixed(1)}%</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <h4>Detailed Expenses</h4>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Party</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${filteredExpenses.map(expense => `
+                                <tr>
+                                    <td>${formatDate(expense.date)}</td>
+                                    <td>${expense.category}</td>
+                                    <td>${expense.description}</td>
+                                    <td>${formatCurrency(expense.amount)}</td>
+                                    <td>${expense.party || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <button class="btn" onclick="exportReportCSV('expenses')">Export CSV</button>
+                </div>
+            `;
+        }
+
+        async function generateInventoryValuation(output) {
+            const inventory = await db.getAll('inventory');
+            
+            let totalValue = 0;
+            const valuedInventory = inventory.map(item => {
+                const value = item.stock * item.costPrice;
+                totalValue += value;
+                return { ...item, value };
+            });
+            
+            output.innerHTML = `
+                <div class="card">
+                    <h3>Inventory Valuation Report</h3>
+                    <p><strong>Valuation Method:</strong> FIFO (First In, First Out)</p>
+                    <p><strong>Report Date:</strong> ${formatDate(new Date())}</p>
+                    
+                    <div class="stat-card" style="margin-bottom: 1rem;">
+                        <div class="stat-value">${formatCurrency(totalValue)}</div>
+                        <div class="stat-label">Total Inventory Value</div>
+                    </div>
+                    
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>SKU</th>
+                                <th>Name</th>
+                                <th>Category</th>
+                                <th>Stock</th>
+                                <th>Cost Price</th>
+                                <th>Total Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${valuedInventory.map(item => `
+                                <tr>
+                                    <td>${item.sku}</td>
+                                    <td>${item.name}</td>
+                                    <td>${item.category}</td>
+                                    <td>${item.stock}</td>
+                                    <td>${formatCurrency(item.costPrice)}</td>
+                                    <td>${formatCurrency(item.value)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <button class="btn" onclick="exportReportCSV('inventory-valuation')">Export CSV</button>
+                </div>
+            `;
+        }
+
+        // Settings functions
+        async function saveSettings() {
+            const settings = {
+                businessName: document.getElementById('businessName').value,
+                defaultCurrency: document.getElementById('defaultCurrency').value,
+                valuationMethod: document.getElementById('valuationMethod').value,
+                backupFrequency: document.getElementById('backupFrequency').value
+            };
+            
+            try {
+                for (const [key, value] of Object.entries(settings)) {
+                    await db.update('settings', { key, value });
+                }
+                showToast('Settings saved successfully');
+            } catch (error) {
+                showToast('Error saving settings: ' + error.message, 'error');
+            }
+        }
+
+        async function loadSettings() {
+            try {
+                const settings = await db.getAll('settings');
+                const settingsObj = {};
+                settings.forEach(setting => {
+                    settingsObj[setting.key] = setting.value;
+                });
+                
+                if (settingsObj.businessName) document.getElementById('businessName').value = settingsObj.businessName;
+                if (settingsObj.defaultCurrency) document.getElementById('defaultCurrency').value = settingsObj.defaultCurrency;
+                if (settingsObj.valuationMethod) document.getElementById('valuationMethod').value = settingsObj.valuationMethod;
+                if (settingsObj.backupFrequency) document.getElementById('backupFrequency').value = settingsObj.backupFrequency;
+            } catch (error) {
+                console.log('Settings not found, using defaults');
+            }
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Initialize theme
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', async () => {
+            initTheme();
+            
+            // Wait for database to initialize
+            await db.init();
+            
+            // Load initial data
+            await loadSettings();
+            await loadDashboard();
+            
+            // Set up navigation
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const page = item.getAttribute('data-page');
+                    navigateTo(page);
+                });
+            });
+            
+            // Set default date inputs to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('reportFromDate').value = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+            document.getElementById('reportToDate').value = today;
+            
+            // Auto-backup check
+            checkAutoBackup();
+        });
+
+        // Auto-backup functionality
+        async function checkAutoBackup() {
+            try {
+                const settings = await db.getAll('settings');
+                const backupFrequency = settings.find(s => s.key === 'backupFrequency')?.value || 'weekly';
+                const lastBackup = localStorage.getItem('lastAutoBackup');
+                
+                if (backupFrequency === 'disabled') return;
+                
+                const now = new Date();
+                const lastBackupDate = lastBackup ? new Date(lastBackup) : new Date(0);
+                
+                let shouldBackup = false;
+                
+                switch (backupFrequency) {
+                    case 'daily':
+                        shouldBackup = now - lastBackupDate > 24 * 60 * 60 * 1000;
+                        break;
+                    case 'weekly':
+                        shouldBackup = now - lastBackupDate > 7 * 24 * 60 * 60 * 1000;
+                        break;
+                    case 'monthly':
+                        shouldBackup = now - lastBackupDate > 30 * 24 * 60 * 60 * 1000;
+                        break;
+                }
+                
+                if (shouldBackup) {
+                    await exportBackup();
+                    localStorage.setItem('lastAutoBackup', now.toISOString());
+                }
+            } catch (error) {
+                console.log('Auto-backup check failed:', error);
+            }
+        }
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swScript = `
+                    const CACHE_NAME = 'business-manager-v1';
+                    const urlsToCache = ['/'];
+                    
+                    self.addEventListener('install', event => {
+                        event.waitUntil(
+                            caches.open(CACHE_NAME)
+                                .then(cache => cache.addAll(urlsToCache))
+                        );
+                    });
+                    
+                    self.addEventListener('fetch', event => {
+                        event.respondWith(
+                            caches.match(event.request)
+                                .then(response => response || fetch(event.request))
+                        );
+                    });
+                `;
+                
+                const blob = new Blob([swScript], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                
+                navigator.serviceWorker.register(swUrl)
+                    .then(registration => console.log('SW registered'))
+                    .catch(error => console.log('SW registration failed'));
+            });
+        }
+    </script>
+</body>
+</html>

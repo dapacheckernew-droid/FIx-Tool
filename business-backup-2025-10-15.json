@@ -1,0 +1,15 @@
+{
+  "version": "1.0",
+  "timestamp": "2025-10-15T09:18:24.151Z",
+  "data": {
+    "inventory": [],
+    "sales": [],
+    "purchases": [],
+    "expenses": [],
+    "loans": [],
+    "payments": [],
+    "transfers": [],
+    "attachments": [],
+    "settings": []
+  }
+}
